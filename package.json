@@ -1,0 +1,10 @@
+{
+	"name": "neat-studio",
+	"main": "node.js",
+	"scripts": {
+		"start": "node node.js"
+	},
+	"dependencies": {
+		"express": "^4.17.3"
+	}
+}
