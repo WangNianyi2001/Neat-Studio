@@ -1,6 +1,6 @@
 # 项目开发手册
 
-此项目用 TypeScript + Vue.js 开发，本地用 express 搭成的简易 localhost 调试。
+此项目用 TypeScript + Vue.js 开发。
 
 ## 调试、构建
 
@@ -21,7 +21,7 @@
 	+ neat-studio.ts	模块依赖集总
 ```
 
-## 坑
+## 注释
 
 浏览器原生不支持裸模块引用（即如 `import _ from 'lodash'` 这种非目录的引用）。
 为了使用 Vue.js，最佳实践是通过 [import-maps](
