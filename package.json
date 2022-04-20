@@ -2,10 +2,13 @@
 	"name": "neat-studio",
 	"main": "node.js",
 	"scripts": {
-		"start": "node node.js"
+		"build": "npx tsc",
+		"localhost": "npx vite"
 	},
 	"dependencies": {
-		"express": "^4.17.3"
+		"express": "^4.17.3",
+		"vite": "^2.9.5",
+		"vue": "^3.2.33"
 	},
 	"devDependencies": {
 		"typescript": "^4.6.3"
