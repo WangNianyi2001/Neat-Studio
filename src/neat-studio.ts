@@ -1,7 +1,6 @@
-import Session from "./session";
+/// <reference path="core.ts" />
+/// <reference path="session.ts" />
 
-Session.current = new Session();
-
-export default {
-	Session
-};
+namespace Neat {
+	Core.Session.current = new Core.Session();
+}
