@@ -6,7 +6,6 @@
 		"debug": "npx vite"
 	},
 	"dependencies": {
-		"express": "^4.17.3",
 		"vite": "^2.9.5",
 		"vue": "^3.2.33"
 	},
