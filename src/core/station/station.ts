@@ -30,6 +30,11 @@ abstract class Port {
 		this.node = node;
 		this.index = index;
 	}
+
+	Disconnect() {
+		this.route?.Close();
+		this.route = null;
+	}
 }
 
 class Plug extends Port {
@@ -60,7 +65,6 @@ abstract class Source implements IStation {
 
 class Destination implements IStation {
 	readonly node: AudioNode;
-	readonly outNode = null;
 	readonly sockets: Socket[];
 	readonly plugs: Plug[] = [];
 	readonly length = Infinity;
