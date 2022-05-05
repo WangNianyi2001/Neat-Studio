@@ -6,6 +6,8 @@
 
 - 编译：
 	运行 `npm run build`。
+- 清理编译结果：
+	运行 `npm run clean`。
 - 本地浏览器调试：
 	运行 `npm run localhost`，访问 `localhost:3000`。
 

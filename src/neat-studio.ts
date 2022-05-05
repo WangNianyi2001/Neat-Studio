@@ -1,2 +1,7 @@
-import Station from './core/station.js';
-export { Station };
+import Session from "./session";
+
+Session.current = new Session();
+
+export default {
+	Session
+};
