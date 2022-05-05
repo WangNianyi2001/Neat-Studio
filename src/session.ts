@@ -1,26 +1,28 @@
-/// <reference path="./core.ts" />
+import * as Core from './core';
 
-namespace Neat.Core {
-	class Destination implements Station {
-		get imports(): readonly Station.Import<any>[] {
-			throw new Error("Method not implemented.");
-		}
-		readonly exports: Station.Export<any>[] = [];
-		readonly length = Infinity;
+class Destination implements Core.Station {
+	readonly #node: AudioDestinationNode;
 
-		constructor(node: AudioDestinationNode) {
-		}
+	readonly imports: Core.Station.Import<any>[];
+	readonly exports: Core.Station.Export<any>[] = [];
+	readonly length = Infinity;
+
+	constructor(node: AudioDestinationNode) {
+		this.#node = node;
+		this.imports = [
+			new Core.Audio.Import(this.#node)
+		];
 	}
+}
 
-	export class Session {
-		static current: Session;
-	
-		readonly context: AudioContext;
-		readonly destination: Destination;
-	
-		constructor() {
-			this.context = new AudioContext();
-			this.destination = new Destination(this.context.destination);
-		}
+export default class Session {
+	static current: Session;
+
+	readonly context: AudioContext;
+	readonly destination: Destination;
+
+	constructor() {
+		this.context = new AudioContext();
+		this.destination = new Destination(this.context.destination);
 	}
 }

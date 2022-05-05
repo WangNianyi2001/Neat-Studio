@@ -1,6 +1,5 @@
-/// <reference path="core.ts" />
-/// <reference path="session.ts" />
+import * as Core from './core';
 
-namespace Neat {
-	Core.Session.current = new Core.Session();
-}
+Core.Session.current = new Core.Session();
+
+export { Core };

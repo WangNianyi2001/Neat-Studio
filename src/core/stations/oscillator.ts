@@ -1,16 +1,15 @@
-/// <reference path="../audio.ts" />
+import Station from '../station';
+import * as Audio from '../audio';
 
-namespace Neat.Core.Audio {
-	export class Oscillator implements Station {
-		node: OscillatorNode;
+export class Oscillator implements Station {
+	node: OscillatorNode;
 
-		readonly imports: Station.Import<any>[] = [];
-		readonly exports: Station.Export<any>[];
-		length = Infinity;
+	readonly imports: Station.Import<any>[] = [];
+	readonly exports: Station.Export<any>[];
+	length = Infinity;
 
-		constructor(session: Session) {
-			this.node = new OscillatorNode(session.context);
-			this.exports = [new Export(this.node)];
-		}
+	constructor(context: AudioContext) {
+		this.node = new OscillatorNode(context);
+		this.exports = [new Audio.Export(this.node)];
 	}
 }

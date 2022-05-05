@@ -1,4 +1,5 @@
-/// <reference path="./core/station.ts" />
-/// <reference path="./core/audio.ts" />
+import Station from './core/station';
+import * as Audio from './core/audio';
+import Session from './session';
 
-export namespace Core {}
+export { Station, Audio, Session };
