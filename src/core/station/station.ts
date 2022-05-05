@@ -10,7 +10,6 @@ class Route {
 			this.plug.index,
 			this.socket.index
 		);
-		console.log(this.plug.node);
 	}
 
 	Close() {
@@ -23,34 +22,23 @@ class Route {
 }
 
 abstract class Port {
-	readonly station: Station;
-	readonly channelCount: number;
+	readonly node: AudioNode;
 	readonly index: number;
 	route: Route | null = null;
 
-	constructor(station: Station, channelCount: number, index: number = 0) {
-		this.station = station;
-		this.channelCount = channelCount;
+	constructor(node: AudioNode, index: number = 0) {
+		this.node = node;
 		this.index = index;
 	}
-	abstract get node(): AudioNode;
 }
 
 class Plug extends Port {
-	override get node(): AudioNode {
-		return this.station.outNode!;
-	}
-
 	Connect(destination: Socket) {
 		this.route = destination.route = new Route(this, destination);
 	}
 }
 
 class Socket extends Port {
-	override get node(): AudioNode {
-		return this.station.inNode!;
-	}
-
 	Connect(source: Plug) {
 		source.Connect(this);
 	}
@@ -58,39 +46,29 @@ class Socket extends Port {
 
 import Session from '../../session';
 
-abstract class Station {
-	readonly session: Session;
-	abstract get inNode(): AudioNode | null;
-	abstract get outNode(): AudioNode | null;
-	abstract get sockets(): readonly Socket[];
-	abstract get plugs(): readonly Plug[];
-	abstract get length(): number;
-
-	constructor(session: Session) {
-		this.session = session;
-	}
+interface IStation {
+	get sockets(): readonly Socket[];
+	get plugs(): readonly Plug[];
+	get length(): number;
 }
 
-abstract class Source extends Station {
-	readonly inNode = null;
-	abstract get outNode(): AudioNode;
-	sockets: readonly Socket[] = [];
+abstract class Source implements IStation {
+	readonly sockets: Socket[] = [];
 	abstract get plugs(): readonly Plug[];
 	abstract get length(): number;
 }
 
-class Destination extends Station {
-	readonly inNode: AudioNode;
+class Destination implements IStation {
+	readonly node: AudioNode;
 	readonly outNode = null;
-	sockets: readonly Socket[];
-	plugs: readonly Plug[] = [];
-	length = Infinity;
+	readonly sockets: Socket[];
+	readonly plugs: Plug[] = [];
+	readonly length = Infinity;
 
 	constructor(session: Session) {
-		super(session);
-		this.inNode = session.context.destination;
-		this.sockets = [new Socket(this, 2)];
+		this.node = session.context.destination;
+		this.sockets = [new Socket(this.node)];
 	}
 }
 
-export { Station, Plug, Socket, Source, Destination };
+export { IStation, Plug, Socket, Source, Destination };

@@ -2,14 +2,14 @@ import Session from '../../session';
 import { Source, Plug } from './station';
 
 class Oscillator extends Source {
-	outNode: OscillatorNode;
+	node: OscillatorNode;
 	readonly plugs: Plug[];
 	length = Infinity;
 
 	constructor(session: Session) {
-		super(session);
-		this.outNode = new OscillatorNode(session.context);
-		this.plugs = [new Plug(this, 2)];
+		super();
+		this.node = new OscillatorNode(session.context);
+		this.plugs = [new Plug(this.node)];
 	}
 }
 
