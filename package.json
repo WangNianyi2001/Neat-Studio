@@ -2,8 +2,8 @@
 	"name": "neat-studio",
 	"main": "node.js",
 	"scripts": {
-		"build": "npx webpack",
-		"debug": "npx vite"
+		"build": "npx webpack -c conf/webpack.config.js",
+		"debug": "npx vite -c conf/vite.config.js"
 	},
 	"dependencies": {
 		"vite": "^2.9.5",

@@ -1,4 +1,4 @@
-import * as Neat from './src/neat-studio';
+import * as Neat from '../src/neat-studio';
 
 (async () => {
 	let session = Neat.Core.Session.current;
