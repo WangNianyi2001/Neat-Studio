@@ -6,8 +6,7 @@
 		"debug": "npx vite -c conf/vite.config.js"
 	},
 	"dependencies": {
-		"vite": "^2.9.5",
-		"vue": "^3.2.33"
+		"vite": "^2.9.5"
 	},
 	"devDependencies": {
 		"ts-loader": "^9.3.0",
