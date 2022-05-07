@@ -1,13 +1,14 @@
-const conf = require('./config');
+import { defineConfig } from 'vite';
+import conf from './conf.js';
 
-export default {
-	root: conf.distDir,
+export default defineConfig({
+	root: conf.rootDir,
 	build: {
 		rollupOptions: {
-			external: true
+			input: [conf.path('index.html')]
 		}
 	},
 	optimizeDeps: {
 		include: []
 	}
-}
+});

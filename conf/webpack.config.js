@@ -1,14 +1,14 @@
-const conf = require('./config');
+import conf from './conf.js';
 
-module.exports = {
+export default {
 	mode: 'development',
 	devtool: 'inline-source-map',
 	entry: {
-		main: conf.dist('index.ts'),
+		main: conf.path('index.ts'),
 	},
 	output: {
-		path: conf.dir,
-		filename: 'index.js'
+		path: conf.rootDir,
+		filename: 'dist/index.js'
 	},
 	resolve: {
 		extensions: ['.ts', '.tsx', '.js'],
@@ -28,5 +28,3 @@ module.exports = {
 		]
 	}
 };
-
-console.log(conf.path('conf/tsconfig.json'));

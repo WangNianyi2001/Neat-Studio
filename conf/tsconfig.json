@@ -9,6 +9,5 @@
 		"strictBindCallApply": true,
 		"skipLibCheck": true
 	},
-	"files": ["../dist/index.ts"],
-	"include": ["../src/"]
+	"files": ["../index.ts"]
 }
