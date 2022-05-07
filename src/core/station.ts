@@ -1,24 +1,32 @@
-interface Station {
-	get imports(): readonly Station.Import<any>[];
-	get exports(): readonly Station.Export<any>[];
-	get length(): number;
+import { Type } from '../utility';
+
+abstract class Station {
+	ports: Station.Port<any>[] = [];
+
+	abstract get length(): number;
+
+	protected AddPort(port: Station.Port<any>): void {
+		if(this.ports.indexOf(port) !== -1)
+			return;
+		this.ports.push(port);
+	}
+
+	protected RemovePort(port: Station.Port<any>): void {
+		const index = this.ports.indexOf(port);
+		if(index === -1)
+			return;
+		this.ports.splice(index, 1);
+	}
+
+	GetPortsOfType<Port extends Station.Port<any>>(type: Type<Port>): Port[] {
+		return <Port[]>this.ports.filter(port => port instanceof type);
+	}
 }
 
 declare module Station {
 	export interface Port<Peer extends Port<any>> {
-		get peer(): Peer | null;
-	}
-
-	export interface Import<
-		Peer extends Export<any>
-	> extends Port<Peer> {
-		Disconnect(): void;
-	}
-	
-	export interface Export<
-		Peer extends Import<any>
-	> extends Port<Peer> {
-		Connect(destination: Peer): void;
+		Connect(target: Peer): void;
+		Disconnect(target: Peer): void;
 	}
 }
 

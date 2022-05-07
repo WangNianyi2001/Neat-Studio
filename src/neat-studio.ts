@@ -2,4 +2,8 @@ import * as Core from './core';
 
 Core.Session.current = new Core.Session();
 
-export { Core };
+declare global {
+	interface Window { Neat: any; }
+}
+
+export default window.Neat = { Core };

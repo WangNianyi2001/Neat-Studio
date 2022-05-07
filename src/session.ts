@@ -1,17 +1,16 @@
 import * as Core from './core';
 
-class Destination implements Core.Station {
+class Destination extends Core.Station {
 	readonly #node: AudioDestinationNode;
+	readonly #import: Core.Audio.Import;
 
-	readonly imports: Core.Station.Import<any>[];
-	readonly exports: Core.Station.Export<any>[] = [];
 	readonly length = Infinity;
 
 	constructor(node: AudioDestinationNode) {
+		super();
 		this.#node = node;
-		this.imports = [
-			new Core.Audio.Import(this.#node)
-		];
+		this.#import = new Core.Audio.Import(this.#node);
+		this.AddPort(this.#import);
 	}
 }
 
