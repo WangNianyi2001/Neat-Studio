@@ -1,49 +1,80 @@
 import Station from './station';
 
-class Delegate {
-	readonly node: AudioNode;
-	readonly index: number;
+abstract class Port<Peer extends Station.Port<any>> extends Station.Port<Peer> {
+	node: AudioNode;
+	index: number = 0;
 
-	constructor(node: AudioNode, index: number) {
+	constructor(node: AudioNode, index: number = 0) {
+		super();
 		this.node = node;
 		this.index = index;
 	}
 
-	Connect(target: Delegate): void {
-		this.node.connect(target.node, this.index, target.index);
+	abstract Replace(node: AudioNode, index: number): void;
+}
+
+export class Connection extends Station.Connection {
+	constructor(from: Export, to: Import) {
+		super([from, to]);
+		from.node.connect(to.node, from.index, to.index);
 	}
 
-	Disconnect(target: Delegate): void {
-		this.node.disconnect(target.node, this.index, target.index);
+	override Destroy(): void {
+		super.Destroy();
+		const [from, to] = <Port<any>[]>this.ports;
+		from.node.disconnect(to.node, from.index, to.index);
 	}
 }
 
-abstract class Port<Peer extends Station.Port<any>> implements Station.Port<Peer> {
-	readonly port: Delegate;
-
-	constructor(node: AudioNode, index: number = 0) {
-		this.port = new Delegate(node, index);
+export class Export extends Port<Import> {
+	Connect(target: Import): void {
+		if(this.ConnectedTo([target]))
+			return;
+		new Connection(this, target);
 	}
-	abstract Connect(target: Peer): void;
-	abstract Disconnect(target: Peer): void;
+
+	Disconnect(target: Import): void {
+		if(!this.ConnectedTo([target]))
+			return;
+		const connection = this.connections.find(
+			connection => connection.HasAll([target])
+		)!;
+		connection.Destroy();
+	}
+
+	override Replace(node: AudioNode, index: number = 0): void {
+		const targets = (<Connection[]>this.connections).map(connection => {
+			const target = <Import>connection.ports[1];
+			connection.Destroy();
+			return target;
+		});
+		this.node = node;
+		this.index = index;
+		targets.forEach(target => new Connection(this, target));
+	}
 }
 
-export class Export extends Port<Import> implements Station.Port<Import> {
-	override Connect(target: Import): void {
-		this.port.Connect(target.port);
-	}
-	override Disconnect(target: Import): void {
-		this.port.Disconnect(target.port);
-	}
-}
-
-export class Import extends Port<Export> implements Station.Port<Export> {
-	override Connect(target: Export): void {
+export class Import extends Port<Export> {
+	Connect(target: Export): void {
 		target.Connect(this);
 	}
-	override Disconnect(target: Export): void {
+
+	Disconnect(target: Export): void {
 		target.Disconnect(this);
+	}
+
+	override Replace(node: AudioNode, index: number = 0): void {
+		const targets = (<Connection[]>this.connections).map(connection => {
+			const target = <Import>connection.ports[0];
+			connection.Destroy();
+			return target;
+		});
+		this.node = node;
+		this.index = index;
+		targets.forEach(target => new Connection(target, this));
 	}
 }
 
 export { Oscillator } from './audio/oscillator';
+export { Sampler } from './audio/sampler';
+export { Sample } from './audio/sample';

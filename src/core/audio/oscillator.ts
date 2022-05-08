@@ -7,9 +7,9 @@ export class Oscillator extends Station {
 
 	readonly length = Infinity;
 
-	constructor(context: AudioContext) {
+	constructor() {
 		super();
-		this.#node = new OscillatorNode(context);
+		this.#node = new OscillatorNode(Station.context);
 		this.#export = new Audio.Export(this.#node);
 		this.AddPort(this.#export);
 	}

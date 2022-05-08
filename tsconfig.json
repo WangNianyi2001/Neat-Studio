@@ -4,8 +4,7 @@
 		"baseUrl": "./src/",
 		"paths": {
 			"@neat/*": ["./*"],
-			"@core/*": ["./core/*"],
-			"@audio/*": ["./core/audio*/"]
+			"@core/*": ["./core/*"]
 		},
 		"target": "es2016",
 		"module": "ES6",

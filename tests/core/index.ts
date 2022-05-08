@@ -1,14 +1,26 @@
 import Neat from '@neat/neat-studio';
+import { ChooseFile } from '@neat/utility';
 
-(async () => {
-	const session = Neat.Core.Session.current;
-	const sessionIm = session.destination.GetPortsOfType(Neat.Core.Audio.Import)[0];
-	const osc = new Neat.Core.Audio.Oscillator(session.context);
-	const oscEx = osc.GetPortsOfType(Neat.Core.Audio.Export)[0];
-	oscEx.Connect(sessionIm);
-	osc.Start();
-	osc.Stop(.5);
-	setTimeout(() => {
-		oscEx.Disconnect(sessionIm);
-	}, 1000);
-})();
+declare global {
+	interface Window {
+		showOpenFilePicker(options?: any): FileSystemFileHandle[];
+	}
+}
+
+const sampler = new Neat.Core.Audio.Sampler();
+const session = Neat.Core.Session.current;
+sampler.GetPortsOfType(Neat.Core.Audio.Export)[0].Connect(
+	session.destination.GetPortsOfType(Neat.Core.Audio.Import)[0]
+);
+
+const playChosenFile = async () => {
+	const files = await ChooseFile();
+	if(files.length < 1)
+		return;
+	const file = files[0];
+	const sample = await Neat.Core.Audio.Sample.LoadFromFile(file);
+	sampler.SetSample(sample);
+	sampler.Start();
+};
+
+window.onclick = playChosenFile;

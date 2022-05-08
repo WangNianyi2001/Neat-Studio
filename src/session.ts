@@ -21,7 +21,7 @@ export default class Session {
 	readonly destination: Destination;
 
 	constructor() {
-		this.context = new AudioContext();
+		this.context = Core.Station.context = new AudioContext();
 		this.destination = new Destination(this.context.destination);
 	}
 }
