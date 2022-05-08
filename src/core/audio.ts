@@ -30,7 +30,7 @@ export async function LoadFromFile(source: File): Promise<AudioBuffer> {
 	return buffer;
 }
 
-abstract class Port<Peer extends Station.Port<any>> extends Station.Port<Peer> {
+abstract class Port<Peer extends Station.Port<any, Route>> extends Station.Port<Peer, Route> {
 	node: AudioNode;
 	index: number = 0;
 
@@ -40,17 +40,17 @@ abstract class Port<Peer extends Station.Port<any>> extends Station.Port<Peer> {
 		this.index = index;
 	}
 
-	abstract PeerOf(connection: Connection): Peer;
+	abstract PeerOf(route: Route): Peer;
 
 	abstract Replace(node: AudioNode, index: number): void;
 }
 
-export class Connection extends Station.Connection {
+export class Route extends Station.Route<Export, Import> {
 	readonly from: Export;
 	readonly to: Import;
 
 	constructor(from: Export, to: Import) {
-		super([from, to]);
+		super(from, to);
 		[this.from, this.to] = [from, to]
 		from.node.connect(to.node, from.index, to.index);
 	}
@@ -63,27 +63,27 @@ export class Connection extends Station.Connection {
 
 export class Export extends Port<Import> {
 	override Connect(target: Import): void {
-		if(this.ConnectedTo([target]))
+		if(this.ConnectedTo(target))
 			return;
-		new Connection(this, target);
+		new Route(this, target);
 	}
 
 	override Disconnect(target: Import): void {
-		if(!this.ConnectedTo([target]))
+		if(!this.ConnectedTo(target))
 			return;
-		const connection = this.connections.find(
-			connection => connection.HasAll([target])
+		const route = [...this.routes].find(
+			route => route.Has(target)
 		)!;
-		connection.Destroy();
+		route.Destroy();
 	}
 	
-	override PeerOf(connection: Connection): Import {
-		return connection.to;
+	override PeerOf(route: Route): Import {
+		return route.to;
 	}
 
 	override Replace(node: AudioNode, index: number = 0): void {
-		this.connections.forEach(connection => {
-			const target = this.PeerOf(<Connection>connection);
+		this.routes.forEach(route => {
+			const target = this.PeerOf(<Route>route);
 			this.node.disconnect(target.node, this.index, target.index);
 			node.connect(target.node, index, target.index);
 		});
@@ -101,13 +101,13 @@ export class Import extends Port<Export> {
 		target.Disconnect(this);
 	}
 	
-	override PeerOf(connection: Connection): Export {
-		return connection.from;
+	override PeerOf(route: Route): Export {
+		return route.from;
 	}
 
 	override Replace(node: AudioNode, index: number = 0): void {
-		this.connections.forEach(connection => {
-			const target = this.PeerOf(<Connection>connection);
+		this.routes.forEach(route => {
+			const target = this.PeerOf(<Route>route);
 			target.node.disconnect(this.node, target.index, this.index);
 			target.node.connect(node, target.index, index);
 		});
