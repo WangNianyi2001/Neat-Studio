@@ -3,7 +3,6 @@ import { Sample } from './sample';
 import * as Audio from '@core/audio';
 
 export class Sampler extends Station {
-	#sample: Sample | null = null;
 	#node: AudioBufferSourceNode;
 	#export: Audio.Export;
 
@@ -14,17 +13,16 @@ export class Sampler extends Station {
 		this.AddPort(this.#export);
 	}
 
-	SetSample(sample: Sample): void {
+	SetSample(buffer: AudioBuffer): void {
 		this.#node = new AudioBufferSourceNode(Station.context);
-		this.#sample = sample;
-		this.#node.buffer = this.#sample.buffer;
+		this.#node.buffer = buffer;
 		this.#export.Replace(this.#node);
 	}
 
 	get length(): number {
-		if(this.#sample === null)
+		if(this.#node.buffer === null)
 			return NaN;
-		return this.#sample.buffer.length;
+		return this.#node.buffer.length;
 	}
 
 	Start(t: number = 0): void {

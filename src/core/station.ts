@@ -26,7 +26,7 @@ abstract class Station {
 }
 
 module Station {
-	export abstract class Connection {
+	export class Connection {
 		ports: Port<any>[];
 
 		constructor(parts: Port<any>[]) {

@@ -1,12 +1,6 @@
 import Neat from '@neat/neat-studio';
 import { ChooseFile } from '@neat/utility';
 
-declare global {
-	interface Window {
-		showOpenFilePicker(options?: any): FileSystemFileHandle[];
-	}
-}
-
 const sampler = new Neat.Core.Audio.Sampler();
 const session = Neat.Core.Session.current;
 sampler.GetPortsOfType(Neat.Core.Audio.Export)[0].Connect(
@@ -18,7 +12,7 @@ const playChosenFile = async () => {
 	if(files.length < 1)
 		return;
 	const file = files[0];
-	const sample = await Neat.Core.Audio.Sample.LoadFromFile(file);
+	const sample = await Neat.Core.Audio.LoadFromFile(file);
 	sampler.SetSample(sample);
 	sampler.Start();
 };
