@@ -1,4 +1,4 @@
-import Neat from './src/neat-studio';
+import Neat from '../../src/neat-studio';
 
 (async () => {
 	const session = Neat.Core.Session.current;

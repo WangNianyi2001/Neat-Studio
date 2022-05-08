@@ -3,8 +3,8 @@
 	"main": "node.js",
 	"type": "module",
 	"scripts": {
-		"build": "npx vite -c conf/vite.config.js build",
-		"preview": "npx vite -c conf/vite.config.js --port 3000"
+		"build": "npx vite build",
+		"dev": "npx vite dev"
 	},
 	"dependencies": {
 		"vite": "^2.9.5",
