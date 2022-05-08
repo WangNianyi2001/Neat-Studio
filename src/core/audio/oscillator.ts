@@ -1,5 +1,5 @@
-import Station from '../station';
-import * as Audio from '../audio';
+import Station from '@core/station';
+import * as Audio from '@core/audio';
 
 export class Oscillator extends Station {
 	readonly #node: OscillatorNode;

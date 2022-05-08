@@ -1,4 +1,4 @@
-import { Type } from '../utility';
+import { Type } from '@neat/utility';
 
 abstract class Station {
 	ports: Station.Port<any>[] = [];

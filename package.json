@@ -7,11 +7,13 @@
 		"dev": "npx vite dev"
 	},
 	"dependencies": {
+		"module-alias": "^2.2.2",
 		"vite": "^2.9.5",
 		"webpack": "^5.72.0"
 	},
 	"devDependencies": {
 		"ts-loader": "^9.3.0",
-		"typescript": "^4.6.4"
+		"typescript": "^4.6.4",
+		"vite-tsconfig-paths": "^3.4.1"
 	}
 }
