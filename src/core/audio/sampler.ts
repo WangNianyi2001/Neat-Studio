@@ -1,5 +1,4 @@
 import Station from '@core/station';
-import { Sample } from './sample';
 import * as Audio from '@core/audio';
 
 export class Sampler extends Station {

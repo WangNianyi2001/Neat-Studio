@@ -30,90 +30,78 @@ export async function LoadFromFile(source: File): Promise<AudioBuffer> {
 	return buffer;
 }
 
-abstract class Port<Peer extends Station.Port<any, Route>> extends Station.Port<Peer, Route> {
-	node: AudioNode;
-	index: number = 0;
+class Delegate {
+	readonly node: AudioNode;
+	readonly index: number;
 
 	constructor(node: AudioNode, index: number = 0) {
-		super();
 		this.node = node;
 		this.index = index;
 	}
 
-	abstract PeerOf(route: Route): Peer;
+	Connect(target: Delegate): void {
+		this.node.connect(target.node, this.index, target.index);
+	}
 
-	abstract Replace(node: AudioNode, index: number): void;
+	Disconnect(target: Delegate): void {
+		this.node.disconnect(target.node, this.index, target.index);
+	}
 }
 
 export class Route extends Station.Route<Export, Import> {
-	readonly from: Export;
-	readonly to: Import;
-
 	constructor(from: Export, to: Import) {
 		super(from, to);
-		[this.from, this.to] = [from, to]
-		from.node.connect(to.node, from.index, to.index);
+		this.from.delegate.Connect(this.to.delegate);
 	}
 
 	override Destroy(): void {
+		this.from.delegate.Disconnect(this.to.delegate);
 		super.Destroy();
-		this.from.node.disconnect(this.to.node, this.from.index, this.to.index);
+	}
+}
+
+abstract class Port<Peer extends Export | Import> extends Station.Port<Peer, Route> {
+	delegate: Delegate;
+
+	constructor(node: AudioNode, index: number = 0) {
+		super();
+		this.delegate = new Delegate(node, index);
+	}
+
+	Replace(node: AudioNode, index: number = 0): void {
+		const replacement = new Delegate(node, index);
+		this.routes.forEach(route => {
+			const peer = this.PeerOf(<Route>route);
+			const [fromOld, toOld, fromNew, toNew] = this instanceof Export
+				? [this.delegate, peer.delegate, replacement, peer.delegate]
+				: [peer.delegate, this.delegate, peer.delegate, replacement];
+			fromOld.Disconnect(toOld);
+			fromNew.Connect(toNew);
+		});
+		this.delegate = replacement;
+	}
+	
+	override Connect(target: Peer): void {
+		if(this.ConnectedTo(target))
+			return;
+		Route.Connect(Export, Import, Route, this, target);
+	}
+
+	override Disconnect(target: Peer): void {
+		if(!this.ConnectedTo(target))
+			return;
+		for(const route of this.routes) {
+			if(!route.Has(target))
+				continue;
+			route.Destroy();
+		}
 	}
 }
 
 export class Export extends Port<Import> {
-	override Connect(target: Import): void {
-		if(this.ConnectedTo(target))
-			return;
-		new Route(this, target);
-	}
-
-	override Disconnect(target: Import): void {
-		if(!this.ConnectedTo(target))
-			return;
-		const route = [...this.routes].find(
-			route => route.Has(target)
-		)!;
-		route.Destroy();
-	}
-	
-	override PeerOf(route: Route): Import {
-		return route.to;
-	}
-
-	override Replace(node: AudioNode, index: number = 0): void {
-		this.routes.forEach(route => {
-			const target = this.PeerOf(<Route>route);
-			this.node.disconnect(target.node, this.index, target.index);
-			node.connect(target.node, index, target.index);
-		});
-		this.node = node;
-		this.index = index;
-	}
 }
 
 export class Import extends Port<Export> {
-	override Connect(target: Export): void {
-		target.Connect(this);
-	}
-
-	override Disconnect(target: Export): void {
-		target.Disconnect(this);
-	}
-	
-	override PeerOf(route: Route): Export {
-		return route.from;
-	}
-
-	override Replace(node: AudioNode, index: number = 0): void {
-		this.routes.forEach(route => {
-			const target = this.PeerOf(<Route>route);
-			target.node.disconnect(this.node, target.index, this.index);
-			target.node.connect(node, target.index, index);
-		});
-		this.node = node;
-		this.index = index;
-	}
 }
 
 export { Oscillator } from './audio/oscillator';

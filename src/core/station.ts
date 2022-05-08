@@ -34,14 +34,26 @@ module Station {
 		readonly to: To;
 
 		constructor(from: From, to: To) {
-			if(from.ConnectedTo(to))
-				throw new Error('Cannot connect two already conencted ports');
-			this.from = from;
-			this.to = to;
-			this.from.routes.add(this);
-			this.to.routes.add(this);
+			[this.from, this.to] = [from, to];
+			[this.from, this.to].forEach(port => port.routes.add(this));
 		}
 
+		static Connect<
+			From extends Port<any, any>,
+			To extends Port<any, any>
+		>(
+			tFrom: Type<From>, tTo: Type<To>, tRoute: Type<Route<From, To>>,
+			a: From | To, b: From | To
+		): Route<From, To> | null {
+			const typeOk = (a instanceof tFrom) !== (b instanceof tFrom) && (a instanceof tTo) !== (b instanceof tTo);
+			if(!typeOk)
+				return null;
+			if(b instanceof tFrom)
+				[a, b] = [b, a];
+			const [from, to] = [<From>a, <To>b];
+			return new tRoute(from, to);
+		}
+		
 		Destroy(): void {
 			this.from.routes.delete(this);
 			this.to.routes.delete(this);
@@ -49,6 +61,12 @@ module Station {
 
 		Has(port: From | To): boolean {
 			return this.from === port || this.to === port;
+		}
+
+		PeerOf(port: From | To) : From | To | null {
+			if(!this.Has(port))
+				return null;
+			return port === this.from ? this.to : this.from;
 		}
 	}
 
@@ -63,16 +81,28 @@ module Station {
 		}
 
 		abstract Connect(target: Peer): void;
+
 		abstract Disconnect(target: Peer): void;
 
 		RoutesTo(target: Peer): Set<Route> {
-			return new Set([...this.routes]
-				.filter(route => route.Has(target))
-			);
+			const set = new Set<Route>();
+			for(const route of this.routes) {
+				if(route.Has(target))
+					set.add(route);
+			}
+			return set;
 		}
 
 		ConnectedTo(target: Peer): boolean {
-			return this.RoutesTo(target).size != 0;
+			for(const route of this.routes) {
+				if(route.Has(target))
+					return true;
+			}
+			return false;
+		}
+
+		PeerOf(route: Route): Peer {
+			return <Peer>route.PeerOf(this)!;
 		}
 	}
 }
