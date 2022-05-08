@@ -13,14 +13,14 @@
 
 ```plaintext
 /
-+ conf/		配置文件
++ dist/	发布目录
 + doc/	说明文件
 + src/	源码
 	+ core/	核心代码
 	+ ui/	界面代码
 	+ neat-studio.ts	依赖集总
-+ dist/	运行目录
-	+ index.html	主页面
++ tests/	测试页面
+index.html	主页面
 ```
 
 ## 附录
