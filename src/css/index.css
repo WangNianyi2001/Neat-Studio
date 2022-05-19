@@ -56,7 +56,7 @@
 #trackscontainer {
     width: 25%;
     height: 100%;
-    background-color: red;
+    background-color: green;
 }
 
 #virtualarea {
@@ -64,4 +64,65 @@
     width: 100%;
     height: 100%;
     background-color: wheat;
+}
+
+#menu {
+    height: 100%;
+    width: 70px;
+    background-color: red;
+    float: left;
+}
+
+#toolbar {
+    height: 100%;
+    width: 420px;
+    float: left;
+}
+
+#back {
+    height: 100%;
+    width: 70px;
+    background-color: orange;
+    float: left;
+}
+
+#next {
+    height: 100%;
+    width: 70px;
+    background-color: rebeccapurple;
+    float: left;
+}
+
+#edittool {
+    height: 100%;
+    width: 280px;
+    background-color: salmon;
+    float: left;
+}
+
+#transport {
+    height: 100%;
+    width: 210px;
+    float: left;
+}
+
+#start {
+    height: 100%;
+    width: 70px;
+    background-color: paleturquoise;
+    float: left;
+}
+
+#stop {
+    height: 100%;
+    width: 70px;
+    background-color: purple;
+    float: left;
+}
+
+#tobegin {
+    height: 100%;
+    width: 70px;
+    background-color: darkblue;
+    float: left;
 }
