@@ -1,0 +1,54 @@
+#main {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    top: 0;
+    left: 0;
+}
+
+#headline {
+    background-color: #212f27;
+    width: 100%;
+    height: 10%;
+    top: 0;
+    left: 0;
+}
+
+#bodypart {
+    width: 100%;
+    height: 90%;
+    background-color: blue;
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+}
+
+#func_part {
+    width: 80%;
+    height: 100%;
+    background-color: red;
+    flex-direction: column;
+    display: flex;
+}
+
+#teach_part {
+    width: 20%;
+    height: 100%;
+    background-color: greenyellow;
+    flex: 1;
+}
+
+#virtualscrollbox {
+    background-color: yellow;
+    height: 70%;
+    width: 100%;
+}
+
+#track {
+    flex: 1;
+    height: 100%;
+    width: 100%;
+    background-color: pink;
+}
