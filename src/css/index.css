@@ -19,7 +19,6 @@
 #bodypart {
     width: 100%;
     height: 90%;
-    background-color: blue;
     flex: 1;
     display: flex;
     flex-direction: row;
@@ -28,7 +27,6 @@
 #func_part {
     width: 80%;
     height: 100%;
-    background-color: red;
     flex-direction: column;
     display: flex;
 }
@@ -44,11 +42,26 @@
     background-color: yellow;
     height: 70%;
     width: 100%;
+    display: flex;
+    flex-direction: row;
 }
 
-#track {
+#trackinspect {
     flex: 1;
     height: 100%;
     width: 100%;
     background-color: pink;
+}
+
+#trackscontainer {
+    width: 25%;
+    height: 100%;
+    background-color: red;
+}
+
+#virtualarea {
+    flex: 1;
+    width: 100%;
+    height: 100%;
+    background-color: wheat;
 }
