@@ -17,8 +17,16 @@ body {
 	background-color: #080808;
 }
 
+header {
+	height: 4em;
+	background-color: #181818;
+}
+
 .panel {
 	position: absolute;
-	padding: 1em;
+	min-width: 2em;
+	min-height: 2em;
+	border: 1px solid dimgray;
+	border-radius: 2px;
 	background-color: #181818;
 }

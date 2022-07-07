@@ -8,6 +8,7 @@
 	},
 	"dependencies": {
 		"module-alias": "^2.2.2",
+		"normalize.css": "^8.0.1",
 		"vite": "^2.9.9",
 		"webpack": "^5.72.0"
 	},
