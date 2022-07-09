@@ -52,5 +52,7 @@ export default class Control {
 
 	Destroy(): void {
 		this.parent?.Remove(this);
+		for(const child of this.#children)
+			child.Destroy();
 	}
 }
