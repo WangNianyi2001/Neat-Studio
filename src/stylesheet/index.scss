@@ -1,14 +1,26 @@
+// General settings
+
 * {
 	box-sizing: border-box;
 }
 
+// Font settings
+
 html {
-	font-size: max(16px, 10pt);
+	font-family: sans-serif;
+	color: white;
+}
+
+// Page layout
+
+html {
 	width: 100%;
 	height: 100%;
 }
 
 body {
+	display: flex;
+	flex-direction: column;
 	position: relative;
 	margin: 0;
 	padding: 0;
@@ -17,16 +29,11 @@ body {
 	background-color: #080808;
 }
 
-header {
+body>header {
 	height: 4em;
 	background-color: #181818;
 }
 
-.panel {
-	position: absolute;
-	min-width: 2em;
-	min-height: 2em;
-	border: 1px solid dimgray;
-	border-radius: 2px;
-	background-color: #181818;
+body>main {
+	flex-grow: 1;
 }

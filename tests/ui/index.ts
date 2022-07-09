@@ -1,3 +1,4 @@
 import Neat from '@neat/neat-studio';
 
-const panel = new Neat.UI.Panel();
+const panel = new Neat.UI.Panel('Test Panel');
+panel.AttachTo(Neat.UI.workspace);
