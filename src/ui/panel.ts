@@ -1,5 +1,6 @@
 import { Control } from '../ui';
 import './panel.scss';
+import Tensor from '@tensor';
 
 class Manager {
 	static instance: Manager | null = null;
@@ -46,11 +47,7 @@ class Resizer {
 
 		this.element.addEventListener('mousedown', () => {
 			const mousemove = (event: MouseEvent) => {
-				const pos = this.panel.position;
-				this.panel.size = [
-					event.pageX - pos[0],
-					event.pageY - pos[1]
-				];
+				this.panel.size = new Tensor([event.pageX, event.pageY]).Minus(this.panel.pagePos);
 			};
 			document.body.addEventListener('mousemove', mousemove);
 			window.addEventListener(
@@ -67,9 +64,12 @@ export default class Panel extends Control {
 	readonly content: Control;
 	readonly resizer: Resizer;
 
-	set size(size: number[]) {
-		this.element.style.width = `${size[0]}px`;
-		this.element.style.height = `${size[1]}px`;
+	set size(size: Tensor) {
+		this.element.style.width = `${size.components![0]}px`;
+		this.element.style.height = `${size.components![1]}px`;
+	}
+	get size(): Tensor {
+		return super.size;
 	}
 
 	constructor(name: string) {

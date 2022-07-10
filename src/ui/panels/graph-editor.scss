@@ -7,9 +7,18 @@
 		position: absolute;
 		width: 100%;
 		height: 100%;
+		transition-property: transform;
+		transition-duration: .25s;
+		transition-timing-function: ease-in-out;
 
 		>* {
 			position: absolute;
+		}
+
+		.station {
+			min-width: 4rem;
+			min-height: 3rem;
+			background-color: red;
 		}
 	}
 }
