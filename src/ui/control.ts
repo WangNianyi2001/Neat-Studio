@@ -1,8 +1,8 @@
-import { Vector as Vec2D } from 'vector2d';
+import Tensor from '@tensor';
 
 class Info {
 	control: Control;
-	size: Vec2D;
+	size: Tensor;
 
 	constructor(control: Control) {
 		this.control = control;
@@ -25,7 +25,7 @@ class Manager {
 	OnFrame() {
 		for(const [control, info] of this.controls.entries()) {
 			const size = control.size;
-			if(!info.size.equals(size)) {
+			if(!info.size.Equal(size)) {
 				control.dispatchEvent(new Event('resize'));
 				info.size = size;
 			}
@@ -56,11 +56,11 @@ export default class Control extends EventTarget {
 	get children(): Control[] {
 		return this.#children.slice();
 	}
-	get size(): Vec2D {
-		return new Vec2D(this.element.offsetWidth, this.element.offsetHeight);
+	get size(): Tensor {
+		return new Tensor([this.element.offsetWidth, this.element.offsetHeight]);
 	}
-	get pagePos(): Vec2D {
-		return new Vec2D(this.element.offsetLeft, this.element.offsetTop);
+	get pagePos(): Tensor {
+		return new Tensor([this.element.offsetLeft, this.element.offsetTop]);
 	}
 
 	constructor(element: HTMLElement) {

@@ -1,6 +1,6 @@
 import { Control } from '../ui';
 import './panel.scss';
-import { Vector as Vec2D } from 'vector2d';
+import Tensor from '@tensor';
 
 class Manager {
 	static instance: Manager | null = null;
@@ -47,7 +47,7 @@ class Resizer {
 
 		this.element.addEventListener('mousedown', () => {
 			const mousemove = (event: MouseEvent) => {
-				this.panel.size = new Vec2D(event.pageX, event.pageY).subtract(this.panel.pagePos);
+				this.panel.size = new Tensor([event.pageX, event.pageY]).Minus(this.panel.pagePos);
 			};
 			document.body.addEventListener('mousemove', mousemove);
 			window.addEventListener(
@@ -64,11 +64,11 @@ export default class Panel extends Control {
 	readonly content: Control;
 	readonly resizer: Resizer;
 
-	set size(size: Vec2D) {
-		this.element.style.width = `${size.x}px`;
-		this.element.style.height = `${size.y}px`;
+	set size(size: Tensor) {
+		this.element.style.width = `${size.components![0]}px`;
+		this.element.style.height = `${size.components![1]}px`;
 	}
-	get size(): Vec2D {
+	get size(): Tensor {
 		return super.size;
 	}
 

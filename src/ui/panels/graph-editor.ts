@@ -4,11 +4,11 @@ import * as SVG from '@svgdotjs/svg.js';
 import './graph-editor.scss';
 import Station from '@core/station';
 import Graph from '@core/graph';
-import { Vector as Vec2D } from 'vector2d';
+import Tensor from '@tensor';
 
 export class StationControl extends Control {
 	readonly station: Station;
-	graphPos: Vec2D = new Vec2D(0, 0);
+	graphPos: Tensor = new Tensor([0, 0]);
 
 	constructor(station: Station) {
 		super(document.createElement('div'));
