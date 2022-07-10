@@ -1,4 +1,4 @@
-import { Type } from '@neat/utility';
+import { Type } from '@util/type';
 
 abstract class Station {
 	static context: AudioContext;
