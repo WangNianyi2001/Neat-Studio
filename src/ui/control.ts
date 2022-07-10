@@ -1,4 +1,4 @@
-import Tensor from '@tensor';
+import Tensor from '@util/tensor';
 
 class Info {
 	control: Control;

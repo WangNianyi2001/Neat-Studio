@@ -1,6 +1,7 @@
 import { Control } from '../ui';
 import './panel.scss';
-import Tensor from '@tensor';
+import Tensor from '@util/tensor';
+import '@util/mousedrag';
 
 class Manager {
 	static instance: Manager | null = null;
@@ -45,16 +46,8 @@ class Resizer {
 		this.element.classList.add('resizer');
 		this.panel.element.append(this.element);
 
-		this.element.addEventListener('mousedown', () => {
-			const mousemove = (event: MouseEvent) => {
-				this.panel.size = new Tensor([event.pageX, event.pageY]).Minus(this.panel.pagePos);
-			};
-			document.body.addEventListener('mousemove', mousemove);
-			window.addEventListener(
-				'mouseup',
-				() => document.body.removeEventListener('mousemove', mousemove),
-				{ once: true }
-			);
+		this.element.addEventListener('mousedragmove', (event: MouseEvent) => {
+			this.panel.size = new Tensor([event.pageX, event.pageY]).Minus(this.panel.pagePos);
 		});
 	}
 }
