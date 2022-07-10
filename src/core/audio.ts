@@ -1,6 +1,5 @@
 import Station from './station';
 
-
 export async function LoadFromFile(source: File): Promise<AudioBuffer> {
 	const reader = new FileReader();
 	reader.readAsArrayBuffer(source);

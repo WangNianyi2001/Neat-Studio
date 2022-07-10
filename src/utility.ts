@@ -25,7 +25,3 @@ export async function ChooseFile(): Promise<File[]> {
 		window.blur();
 	});
 }
-
-export const arrEq = (a: Array<any>, b: Array<any>) =>
-	a.reduce((old, v, i) => old && b[i] === v, true);
-

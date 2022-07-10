@@ -1,5 +1,6 @@
 import { Control } from '../ui';
 import './panel.scss';
+import { Vector as Vec2D } from 'vector2d';
 
 class Manager {
 	static instance: Manager | null = null;
@@ -46,11 +47,7 @@ class Resizer {
 
 		this.element.addEventListener('mousedown', () => {
 			const mousemove = (event: MouseEvent) => {
-				const pos = this.panel.position;
-				this.panel.size = [
-					event.pageX - pos[0],
-					event.pageY - pos[1]
-				];
+				this.panel.size = new Vec2D(event.pageX, event.pageY).subtract(this.panel.pagePos);
 			};
 			document.body.addEventListener('mousemove', mousemove);
 			window.addEventListener(
@@ -67,9 +64,12 @@ export default class Panel extends Control {
 	readonly content: Control;
 	readonly resizer: Resizer;
 
-	set size(size: number[]) {
-		this.element.style.width = `${size[0]}px`;
-		this.element.style.height = `${size[1]}px`;
+	set size(size: Vec2D) {
+		this.element.style.width = `${size.x}px`;
+		this.element.style.height = `${size.y}px`;
+	}
+	get size(): Vec2D {
+		return super.size;
 	}
 
 	constructor(name: string) {
