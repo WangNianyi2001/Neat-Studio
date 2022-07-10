@@ -27,13 +27,13 @@ body {
 	width: 100%;
 	height: 100%;
 	background-color: #080808;
-}
 
-body>header {
-	height: 4em;
-	background-color: #181818;
-}
-
-body>main {
-	flex-grow: 1;
+	>header {
+		height: 4em;
+		background-color: #181818;
+	}
+	
+	>main {
+		flex-grow: 1;
+	}
 }
