@@ -15,47 +15,11 @@ class Manager {
 
 export const manager: Manager = new Manager();
 
-export class Header extends Control {
-	#$name: HTMLElement;
-	get name(): string {
-		return this.#$name.innerText;
-	}
-	set name(value: string) {
-		this.#$name.innerText = value;
-	}
-
-	constructor(panel: Panel, name: string) {
-		const element = document.createElement('header');
-		super(element);
-		this.#$name = document.createElement('p');
-		this.#$name.classList.add('name');
-		this.element.append(this.#$name);
-		this.name = name;
-		this.parent = panel;
-		this.AttachTo(panel, panel.children[0] || null);
-	}
-}
-
-class Resizer {
-	readonly panel: Panel;
-	readonly element: HTMLElement;
-
-	constructor(panel: Panel) {
-		this.panel = panel;
-		this.element = document.createElement('div');
-		this.element.classList.add('resizer');
-		this.panel.element.append(this.element);
-
-		this.element.addEventListener('mousedragmove', (event: MouseEvent) => {
-			this.panel.size = new Tensor([event.pageX, event.pageY]).Minus(this.panel.pagePos);
-		});
-	}
-}
-
 export default class Panel extends Control {
-	readonly header: Header;
+	readonly $header: HTMLElement;
+	readonly $name: HTMLElement;
+	readonly $resizer: HTMLElement;
 	readonly content: Control;
-	readonly resizer: Resizer;
 
 	set size(size: Tensor) {
 		this.element.style.width = `${size.components![0]}px`;
@@ -65,17 +29,34 @@ export default class Panel extends Control {
 		return super.size;
 	}
 
+	get name(): string {
+		return this.$name.innerText;
+	}
+	set name(value: string) {
+		this.$name.innerText = value;
+	}
+
 	constructor(name: string) {
-		const element = document.createElement('section');
-		element.classList.add('panel');
+		super(document.createElement('section'));
+		this.element.classList.add('panel');
 
-		super(element);
+		this.$header = document.createElement('header');
+		this.element.append(this.$header);
 
-		this.header = new Header(this, name);
+		this.$name = document.createElement('p');
+		this.$name.classList.add('name');
+		this.$header.append(this.$name);
+
+		this.name = name;
 
 		this.content = new Control(document.createElement('main'));
-		this.Attach(this.content);
+		this.content.AttachTo(this);
 
-		this.resizer = new Resizer(this);
+		this.$resizer = document.createElement('div');
+		this.$resizer.classList.add('resizer');
+		this.element.append(this.$resizer);
+		this.$resizer.addEventListener('mousedragmove', (event: MouseEvent) => {
+			this.size = new Tensor([event.pageX, event.pageY]).Minus(this.pagePos);
+		});
 	}
 }

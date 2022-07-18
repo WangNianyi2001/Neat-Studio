@@ -1,18 +1,5 @@
 import * as Core from './core';
-
-class Destination extends Core.Station {
-	readonly #node: AudioDestinationNode;
-	readonly #import: Core.Audio.Import;
-
-	readonly length = Infinity;
-
-	constructor(node: AudioDestinationNode) {
-		super();
-		this.#node = node;
-		this.#import = new Core.Audio.Import(this.#node);
-		this.AddPort(this.#import);
-	}
-}
+import Destination from '@core/audio/destination';
 
 export default class Session {
 	static current: Session | null = null;

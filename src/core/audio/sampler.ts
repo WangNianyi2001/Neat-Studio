@@ -3,13 +3,13 @@ import * as Audio from '@core/audio';
 
 export class Sampler extends Station {
 	#node: AudioBufferSourceNode;
-	#export: Audio.Export;
+	#export: Audio.Port;
 
 	constructor() {
 		super();
 		this.#node = new AudioBufferSourceNode(Station.context);
-		this.#export = new Audio.Export(this.#node);
-		this.AddPort(this.#export);
+		this.#export = new Audio.Port(this.#node, Station.PortType.Export);
+		this.AddExport(this.#export);
 	}
 
 	SetSample(buffer: AudioBuffer): void {

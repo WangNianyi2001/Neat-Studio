@@ -47,46 +47,33 @@ class Delegate {
 	}
 }
 
-export class Route extends Station.Route<Export, Import> {
-	constructor(from: Export, to: Import) {
-		super(from, to);
-		this.from.delegate.Connect(this.to.delegate);
-	}
+export const dataType: symbol = Symbol('audio');
 
-	override Destroy(): void {
-		this.from.delegate.Disconnect(this.to.delegate);
-		super.Destroy();
-	}
-}
-
-abstract class Port<Peer extends Export | Import> extends Station.Port<Peer, Route> {
+export class Port extends Station.Port {
 	delegate: Delegate;
 
-	constructor(node: AudioNode, index: number = 0) {
-		super();
+	constructor(node: AudioNode, type: Station.PortType, index: number = 0, name?: string) {
+		super(dataType, type, name);
 		this.delegate = new Delegate(node, index);
 	}
 
 	Replace(node: AudioNode, index: number = 0): void {
 		const replacement = new Delegate(node, index);
 		this.routes.forEach(route => {
-			const peer = this.PeerOf(<Route>route);
-			const [fromOld, toOld, fromNew, toNew] = this instanceof Export
-				? [this.delegate, peer.delegate, replacement, peer.delegate]
-				: [peer.delegate, this.delegate, peer.delegate, replacement];
-			fromOld.Disconnect(toOld);
-			fromNew.Connect(toNew);
+			const peer = this.PeerOf(<Route>route) as Port;
+			this.delegate.Disconnect(peer.delegate);
+			replacement.Connect(peer.delegate);
 		});
 		this.delegate = replacement;
 	}
 	
-	override Connect(target: Peer): void {
+	override Connect(target: Port): void {
 		if(this.ConnectedTo(target))
 			return;
-		Route.Connect(Export, Import, Route, this, target);
+		this.routes.add(new Route(this, target));
 	}
 
-	override Disconnect(target: Peer): void {
+	override Disconnect(target: Port): void {
 		if(!this.ConnectedTo(target))
 			return;
 		for(const route of this.routes) {
@@ -97,10 +84,19 @@ abstract class Port<Peer extends Export | Import> extends Station.Port<Peer, Rou
 	}
 }
 
-export class Export extends Port<Import> {
-}
+export class Route extends Station.Route {
+	get from(): Port { return super.from as Port; }
+	get to(): Port { return super.to as Port; }
 
-export class Import extends Port<Export> {
+	constructor(from: Port, to: Port) {
+		super(from, to);
+		this.from.delegate.Connect(this.to.delegate);
+	}
+
+	override Destroy(): void {
+		this.from.delegate.Disconnect(this.to.delegate);
+		super.Destroy();
+	}
 }
 
 export { Oscillator } from './audio/oscillator';

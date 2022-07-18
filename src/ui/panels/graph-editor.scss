@@ -15,10 +15,62 @@
 			position: absolute;
 		}
 
-		.station {
-			min-width: 4rem;
-			min-height: 3rem;
-			background-color: red;
+		>.station {
+			display: flex;
+			flex-direction: column;
+			min-width: 6rem;
+			background-color: #1c1c1c;
+			border: 1px solid #333;
+			border-radius: .3rem;
+			overflow: hidden;
+
+			>header {
+				$height: 1rem;
+
+				padding-inline: .2rem;
+				height: $height;
+				line-height: $height;
+				background-color: #444;
+				user-select: none;
+				cursor: move;
+			}
+
+			>main {
+				flex-grow: 1;
+				display: flex;
+
+				>.belly {
+					flex-grow: 1;
+				}
+
+				>.slot {
+					padding-block: .2rem .3rem;
+					min-width: 1rem;
+
+					>.port {
+						display: flex;
+						align-items: center;
+						height: 1rem;
+
+						&:hover {
+							background-color: #ffffff30;
+							cursor: pointer;
+						}
+
+						>.knob {
+							$size: .6rem;
+							margin-inline: .2rem;
+							width: $size;
+							height: $size;
+							background-color: white;
+						}
+
+						>.name {
+							user-select: none;
+						}
+					}
+				}
+			}
 		}
 	}
 }

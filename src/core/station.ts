@@ -1,90 +1,73 @@
-import { Type } from '@util/type';
-
 abstract class Station {
 	static context: AudioContext;
 
-	ports: Station.Port<any, any>[] = [];
+	exports: Station.Port[] = [];
+	imports: Station.Port[] = [];
 
 	abstract get length(): number;
 
-	protected AddPort(port: Station.Port<any, any>): void {
-		if(this.ports.indexOf(port) !== -1)
+	protected AddExport(port: Station.Port): void {
+		if(this.exports.indexOf(port) !== -1)
 			return;
-		this.ports.push(port);
+		this.exports.push(port);
+	}
+	protected AddImport(port: Station.Port): void {
+		if(this.imports.indexOf(port) !== -1)
+			return;
+		this.imports.push(port);
 	}
 
-	protected RemovePort(port: Station.Port<any, any>): void {
-		const index = this.ports.indexOf(port);
+	protected RemoveExport(port: Station.Port): void {
+		const index = this.exports.indexOf(port);
 		if(index === -1)
 			return;
-		this.ports.splice(index, 1);
+		this.exports.splice(index, 1);
+	}
+	protected RemoveImport(port: Station.Port): void {
+		const index = this.imports.indexOf(port);
+		if(index === -1)
+			return;
+		this.imports.splice(index, 1);
 	}
 
-	GetPortsOfType<Port extends Station.Port<any, any>>(type: Type<Port>): Port[] {
-		return <Port[]>this.ports.filter(port => port instanceof type);
+	GetExportsOfType(dataType: Symbol): Station.Port[] {
+		return this.exports.filter(port => port.dataType === dataType);
+	}
+	GetImportsOfType(dataType: Symbol): Station.Port[] {
+		return this.imports.filter(port => port.dataType === dataType);
 	}
 }
 
 module Station {
-	export class Route<
-		From extends Port<any, any>,
-		To extends Port<any, any>
-	> {
-		readonly from: From;
-		readonly to: To;
+	export enum PortType {
+		Import, Export
+	};
 
-		constructor(from: From, to: To) {
-			[this.from, this.to] = [from, to];
-			[this.from, this.to].forEach(port => port.routes.add(this));
-		}
+	const portTypeDefaultName = new Map<PortType, string>([
+		[PortType.Import, 'Input'],
+		[PortType.Export, 'Output'],
+	]);
 
-		static Connect<
-			From extends Port<any, any>,
-			To extends Port<any, any>
-		>(
-			tFrom: Type<From>, tTo: Type<To>, tRoute: Type<Route<From, To>>,
-			a: From | To, b: From | To
-		): Route<From, To> | null {
-			const typeOk = (a instanceof tFrom) !== (b instanceof tFrom) && (a instanceof tTo) !== (b instanceof tTo);
-			if(!typeOk)
-				return null;
-			if(b instanceof tFrom)
-				[a, b] = [b, a];
-			const [from, to] = [<From>a, <To>b];
-			return new tRoute(from, to);
-		}
-		
-		Destroy(): void {
-			this.from.routes.delete(this);
-			this.to.routes.delete(this);
-		}
-
-		Has(port: From | To): boolean {
-			return this.from === port || this.to === port;
-		}
-
-		PeerOf(port: From | To) : From | To | null {
-			if(!this.Has(port))
-				return null;
-			return port === this.from ? this.to : this.from;
-		}
-	}
-
-	export abstract class Port<
-		Peer extends Port<any, any>,
-		Route extends Station.Route<any, any>
-	> {
+	export abstract class Port {
+		readonly type: PortType;
+		readonly dataType: Symbol;
+		name: string;
 		routes: Set<Route>;
 
-		constructor() {
+		constructor(dataType: Symbol, type: PortType, name?: string) {
+			if(name === undefined)
+				name = portTypeDefaultName.get(type);
+			this.name = name!;
+			this.dataType = dataType;
+			this.type = type;
 			this.routes = new Set<Route>();
 		}
 
-		abstract Connect(target: Peer): void;
+		abstract Connect(target: Port): void;
 
-		abstract Disconnect(target: Peer): void;
+		abstract Disconnect(target: Port): void;
 
-		RoutesTo(target: Peer): Set<Route> {
+		RoutesTo(target: Port): Set<Route> {
 			const set = new Set<Route>();
 			for(const route of this.routes) {
 				if(route.Has(target))
@@ -93,7 +76,7 @@ module Station {
 			return set;
 		}
 
-		ConnectedTo(target: Peer): boolean {
+		ConnectedTo(target: Port): boolean {
 			for(const route of this.routes) {
 				if(route.Has(target))
 					return true;
@@ -101,10 +84,37 @@ module Station {
 			return false;
 		}
 
-		PeerOf(route: Route): Peer {
-			return <Peer>route.PeerOf(this)!;
+		PeerOf(route: Route): Port {
+			return route.PeerOf(this)!;
 		}
-	}
+	};
+	
+	export class Route {
+		readonly #from: Port;
+		public get from(): Port { return this.#from; }
+		readonly #to: Port;
+		public get to(): Port { return this.#to; }
+
+		constructor(from: Port, to: Port) {
+			[this.#from, this.#to] = [from, to];
+			[this.from, this.to].forEach(port => port.routes.add(this));
+		}
+		
+		Destroy(): void {
+			this.from.routes.delete(this);
+			this.to.routes.delete(this);
+		}
+
+		Has(port: Port): boolean {
+			return this.from === port || this.to === port;
+		}
+
+		PeerOf(port: Port) : Port | null {
+			if(!this.Has(port))
+				return null;
+			return port === this.from ? this.to : this.from;
+		}
+	};
 }
 
 export default Station;

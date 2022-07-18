@@ -70,36 +70,26 @@ export default class Control extends EventTarget {
 		manager.Register(this);
 	}
 
-	AttachTo(parent: Control | null, before: Control | null = null) {
+	AttachTo(parent: Control | null, base: HTMLElement | null = null) {
 		if(this.parent) {
-			this.parent.Remove(this);
+			this.Destroy();
 			this.parent = null;
 		}
-		parent?.Attach(this, before);
-	}
-	Attach(control: Control, before: Control | null = null) {
-		control.parent = this;
-		let index: number = this.#children.length;
-		if(before != null) {
-			const foundIndex = control.#children.indexOf(before);
-			if(foundIndex !== -1)
-				index = foundIndex;
+		if(parent) {
+			this.parent = parent;
+			if(!base)
+				base = this.parent.element;
+			base.appendChild(this.element);
 		}
-		if(index === this.#children.length)
-			this.element.appendChild(control.element);
-		else
-			this.element.insertBefore(control.element, this.children[index]?.element);
 	}
-	Remove(child: Control) {
-		try {
-			this.element.removeChild(child.element);
-			const index = this.#children.indexOf(child);
-			if(index !== -1)
-				this.#children.splice(index, 1);
-		} catch {}
-	}
+	
 	Destroy(): void {
-		this.parent?.Remove(this);
+		this.element.parentNode?.removeChild(this.element);
+		if(this.parent) {
+			const index = this.parent.#children.indexOf(this);
+			if(index !== -1)
+				this.parent.#children.splice(index, 1);
+		}
 		for(const child of this.#children)
 			child.Destroy();
 		manager.Unregister(this);
