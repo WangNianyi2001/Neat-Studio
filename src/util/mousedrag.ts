@@ -14,15 +14,19 @@ export class MouseDragEvent extends MouseEvent {
 	get offset(): Tensor {
 		return this.#pagePos.Minus(this.#start);
 	}
+	readonly $drop: HTMLElement | null = null;
 
 	constructor(type: MouseDragEventType, data: {
 		event: MouseEvent,
 		start: Tensor,
-		pagePos: Tensor
+		pagePos: Tensor,
+		$drop?: HTMLElement | null
 	}) {
 		super(type, data.event);
 		this.#start = data.start.Copy();
 		this.#pagePos = data.pagePos.Copy();
+		if(data.$drop instanceof HTMLElement)
+			this.$drop = data.$drop;
 	}
 }
 
@@ -46,7 +50,11 @@ document.body.addEventListener('mousedown', function(ev: MouseEvent) {
 		(ev: MouseEvent) => {
 			document.body.removeEventListener('mousemove', OnMouseMove);
 			let pagePos = new Tensor([ev.pageX, ev.pageY]);
-			$target.dispatchEvent(new MouseDragEvent('mousedragend', { event: ev, start, pagePos }));
+			$target.dispatchEvent(new MouseDragEvent('mousedragend', {
+				event: ev, start,
+				pagePos,
+				$drop: ev.target as HTMLElement
+			}));
 		},
 		{ once: true }
 	);

@@ -65,6 +65,10 @@
 							background-color: white;
 						}
 
+						&.connected>.knob {
+							background-color: red;
+						}
+
 						>.name {
 							user-select: none;
 						}

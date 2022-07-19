@@ -42,6 +42,23 @@ export class PortControl extends Control {
 		this.name = this.name;
 
 		this.$.append(this.$knob, this.$name);
+
+		this.$.addEventListener('mousedragend', (ev: MouseDragEvent) => {
+			for(
+				let target: HTMLElement | null = ev.$drop;
+				target = target?.parentElement ?? null; ) {
+				if(target.control instanceof PortControl) {
+					this.ConnectTo(target.control);
+					return;
+				}
+			}
+		});
+	}
+
+	ConnectTo(peer: PortControl) {
+		this.port.Connect(peer.port);
+		this.$.classList.add('connected');
+		peer.$.classList.add('connected');
 	}
 }
 
