@@ -50,23 +50,26 @@ declare global {
 }
 
 export default class Control extends EventTarget {
-	readonly element: HTMLElement;
+	readonly $: HTMLElement;
 	parent: Control | null = null;
 	#children: Control[] = [];
 	get children(): Control[] {
 		return this.#children.slice();
 	}
 	get size(): Tensor {
-		return new Tensor([this.element.offsetWidth, this.element.offsetHeight]);
+		return new Tensor([this.$.offsetWidth, this.$.offsetHeight]);
 	}
 	get position(): Tensor {
-		return new Tensor([this.element.offsetLeft, this.element.offsetTop]);
+		return new Tensor([this.$.offsetLeft, this.$.offsetTop]);
+	}
+	get pagePosition(): Tensor {
+		return new Tensor([this.$.clientLeft, this.$.clientTop]);
 	}
 
 	constructor(element: HTMLElement) {
 		super();
-		this.element = element;
-		this.element.control = this;
+		this.$ = element;
+		this.$.control = this;
 		manager.Register(this);
 	}
 
@@ -78,13 +81,13 @@ export default class Control extends EventTarget {
 		if(parent) {
 			this.parent = parent;
 			if(!base)
-				base = this.parent.element;
-			base.appendChild(this.element);
+				base = this.parent.$;
+			base.appendChild(this.$);
 		}
 	}
 	
 	Destroy(): void {
-		this.element.parentNode?.removeChild(this.element);
+		this.$.parentNode?.removeChild(this.$);
 		if(this.parent) {
 			const index = this.parent.#children.indexOf(this);
 			if(index !== -1)

@@ -41,7 +41,7 @@ abstract class Station {
 module Station {
 	export enum PortType {
 		Import, Export
-	};
+	}
 
 	const portTypeDefaultName = new Map<PortType, string>([
 		[PortType.Import, 'Input'],
@@ -87,7 +87,7 @@ module Station {
 		PeerOf(route: Route): Port {
 			return route.PeerOf(this)!;
 		}
-	};
+	}
 	
 	export class Route {
 		readonly #from: Port;
@@ -114,7 +114,10 @@ module Station {
 				return null;
 			return port === this.from ? this.to : this.from;
 		}
-	};
+	}
+	
+	export declare type Constructor = new () => Station;
+	export const types = new Map<string, Constructor>();
 }
 
 export default Station;

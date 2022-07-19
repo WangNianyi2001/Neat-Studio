@@ -17,4 +17,4 @@ export default class Graph {
 	Remove(station: Station) {
 		this.#stations.delete(station);
 	}
-};
+}

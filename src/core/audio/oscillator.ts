@@ -22,3 +22,5 @@ export class Oscillator extends Station {
 		this.#node.stop(t);
 	}
 }
+
+Station.types.set('Oscillator', Oscillator);

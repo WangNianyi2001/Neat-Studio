@@ -32,3 +32,5 @@ export class Sampler extends Station {
 		this.#node.stop(t);
 	}
 }
+
+Station.types.set('Sampler', Sampler);

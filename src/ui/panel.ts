@@ -3,18 +3,6 @@ import './panel.scss';
 import Tensor from '@util/tensor';
 import '@util/mousedrag';
 
-class Manager {
-	static instance: Manager | null = null;
-
-	constructor() {
-		if(Manager.instance !== null)
-			return Manager.instance;
-		Manager.instance = this;
-	}
-}
-
-export const manager: Manager = new Manager();
-
 export default class Panel extends Control {
 	readonly $header: HTMLElement;
 	readonly $name: HTMLElement;
@@ -22,8 +10,8 @@ export default class Panel extends Control {
 	readonly content: Control;
 
 	set size(size: Tensor) {
-		this.element.style.width = `${size.components![0]}px`;
-		this.element.style.height = `${size.components![1]}px`;
+		this.$.style.width = `${size.components![0]}px`;
+		this.$.style.height = `${size.components![1]}px`;
 	}
 	get size(): Tensor {
 		return super.size;
@@ -38,10 +26,10 @@ export default class Panel extends Control {
 
 	constructor(name: string) {
 		super(document.createElement('section'));
-		this.element.classList.add('panel');
+		this.$.classList.add('panel');
 
 		this.$header = document.createElement('header');
-		this.element.append(this.$header);
+		this.$.append(this.$header);
 
 		this.$name = document.createElement('p');
 		this.$name.classList.add('name');
@@ -54,7 +42,7 @@ export default class Panel extends Control {
 
 		this.$resizer = document.createElement('div');
 		this.$resizer.classList.add('resizer');
-		this.element.append(this.$resizer);
+		this.$.append(this.$resizer);
 		this.$resizer.addEventListener('mousedragmove', (event: MouseEvent) => {
 			this.size = new Tensor([event.pageX, event.pageY]).Minus(this.position);
 		});

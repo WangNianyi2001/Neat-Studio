@@ -6,6 +6,7 @@ import Station from '@core/station';
 import Graph from '@core/graph';
 import Tensor from '@util/tensor';
 import { MouseDragEvent } from '@neat/util/mousedrag';
+import { Entry } from '../context-menu';
 
 export class PortControl extends Control {
 	readonly port: Station.Port;
@@ -23,7 +24,7 @@ export class PortControl extends Control {
 
 	constructor(port: Station.Port, stationCtrl: StationControl) {
 		super(document.createElement('div'));
-		this.element.classList.add('port');
+		this.$.classList.add('port');
 
 		this.port = port;
 		this.stationCtrl = stationCtrl;
@@ -40,7 +41,7 @@ export class PortControl extends Control {
 		this.$name.classList.add('name');
 		this.name = this.name;
 
-		this.element.append(this.$knob, this.$name);
+		this.$.append(this.$knob, this.$name);
 	}
 }
 
@@ -61,19 +62,19 @@ export class StationControl extends Control {
 		super(document.createElement('div'));
 		this.editor = editor;
 		this.station = station;
-		this.element.classList.add('station');
+		this.$.classList.add('station');
 
 		this.$header = document.createElement('header');
 		this.$main = document.createElement('main');
-		this.element.append(this.$header, this.$main);
+		this.$.append(this.$header, this.$main);
 		this.name = station.constructor.name;
 
 		this.$header.addEventListener('mousedragstart', () => {
 			const start: Tensor = this.position;
 			const OnMove = ({ offset }: MouseDragEvent) => {
 				const position: Tensor = start.Plus(offset.Scale(1 / this.editor.scale));
-				this.element.style.left = `${position.components![0]}px`;
-				this.element.style.top = `${position.components![1]}px`;
+				this.$.style.left = `${position.components![0]}px`;
+				this.$.style.top = `${position.components![1]}px`;
 			};
 			this.$header.addEventListener('mousedragmove', OnMove);
 			this.$header.addEventListener('mousedragend', function(this: HTMLElement) {
@@ -101,12 +102,25 @@ export default class GraphEditor extends Panel {
 	readonly graph: Graph;
 	readonly viewport: Control;
 	readonly svg: SVG.Svg;
+	readonly contextMenu = new Entry(
+		'', null, [
+			new Entry(
+				'Create New Station', null,
+				[...Station.types].map(
+					([ name, type ]) => new Entry(
+						name, null,
+						this.CreateStation.bind(this, type)
+					)
+				)
+			)
+		]
+	);
 	
 	#scale: number = 1;
 
 	set scale(value: number) {
 		this.#scale = value;
-		this.viewport.element.style.transform = `scale(${this.#scale})`;
+		this.viewport.$.style.transform = `scale(${this.#scale})`;
 	}
 	get scale(): number {
 		return this.#scale;
@@ -116,23 +130,33 @@ export default class GraphEditor extends Panel {
 		super("Graph Editor");
 		this.graph = graph;
 
-		this.element.classList.add('graph-editor');
-		this.element.addEventListener('wheel', (ev: WheelEvent) => {
+		this.$.classList.add('graph-editor');
+		this.$.addEventListener('wheel', (ev: WheelEvent) => {
 			this.scale *= Math.exp(-ev.deltaY / 1000);
 		});
 
 		this.viewport = new Control(document.createElement('div'));
-		this.viewport.element.classList.add('viewport');
+		this.viewport.$.classList.add('viewport');
 		this.viewport.AttachTo(this.content);
+		this.viewport.$.addEventListener('contextmenu', (ev: Event) => {
+			this.contextMenu.Show();
+			ev.preventDefault();
+			return false;
+		});
 
 		this.svg = SVG.SVG();
-		this.svg.addTo(this.viewport.element as HTMLElement);
+		this.svg.addTo(this.viewport.$ as HTMLElement);
 
 		for(const station of this.graph.stations)
-			this.#AddStation(station);
+			this.AddStation(station);
 	}
 
-	#AddStation(station: Station): StationControl {
+	CreateStation(type: Station.Constructor) {
+		const station: Station = new type();
+		this.AddStation(station);
+	}
+
+	AddStation(station: Station): StationControl {
 		const control = new StationControl(this, station);
 		control.AttachTo(this.viewport);
 		return control;
