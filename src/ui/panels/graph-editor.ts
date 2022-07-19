@@ -5,6 +5,7 @@ import './graph-editor.scss';
 import Station from '@core/station';
 import Graph from '@core/graph';
 import Tensor from '@util/tensor';
+import { MouseDragEvent } from '@neat/util/mousedrag';
 
 export class PortControl extends Control {
 	readonly port: Station.Port;
@@ -44,8 +45,8 @@ export class PortControl extends Control {
 }
 
 export class StationControl extends Control {
+	readonly editor: GraphEditor;
 	readonly station: Station;
-	graphPos: Tensor = new Tensor([0, 0]);
 	$header: HTMLElement;
 	$main: HTMLElement;
 	$importSlot: HTMLElement;
@@ -56,8 +57,9 @@ export class StationControl extends Control {
 		this.$header.innerText = name;
 	}
 
-	constructor(station: Station) {
+	constructor(editor: GraphEditor, station: Station) {
 		super(document.createElement('div'));
+		this.editor = editor;
 		this.station = station;
 		this.element.classList.add('station');
 
@@ -65,6 +67,19 @@ export class StationControl extends Control {
 		this.$main = document.createElement('main');
 		this.element.append(this.$header, this.$main);
 		this.name = station.constructor.name;
+
+		this.$header.addEventListener('mousedragstart', () => {
+			const start: Tensor = this.position;
+			const OnMove = ({ offset }: MouseDragEvent) => {
+				const position: Tensor = start.Plus(offset.Scale(1 / this.editor.scale));
+				this.element.style.left = `${position.components![0]}px`;
+				this.element.style.top = `${position.components![1]}px`;
+			};
+			this.$header.addEventListener('mousedragmove', OnMove);
+			this.$header.addEventListener('mousedragend', function(this: HTMLElement) {
+				this.removeEventListener('mousedragmove', OnMove);
+			});
+		});
 
 		this.$importSlot = document.createElement('div');
 		this.$importSlot.classList.add('slot', 'import');
@@ -86,12 +101,25 @@ export default class GraphEditor extends Panel {
 	readonly graph: Graph;
 	readonly viewport: Control;
 	readonly svg: SVG.Svg;
+	
+	#scale: number = 1;
+
+	set scale(value: number) {
+		this.#scale = value;
+		this.viewport.element.style.transform = `scale(${this.#scale})`;
+	}
+	get scale(): number {
+		return this.#scale;
+	}
 
 	constructor(graph: Graph) {
 		super("Graph Editor");
 		this.graph = graph;
 
 		this.element.classList.add('graph-editor');
+		this.element.addEventListener('wheel', (ev: WheelEvent) => {
+			this.scale *= Math.exp(-ev.deltaY / 1000);
+		});
 
 		this.viewport = new Control(document.createElement('div'));
 		this.viewport.element.classList.add('viewport');
@@ -105,7 +133,7 @@ export default class GraphEditor extends Panel {
 	}
 
 	#AddStation(station: Station): StationControl {
-		const control = new StationControl(station);
+		const control = new StationControl(this, station);
 		control.AttachTo(this.viewport);
 		return control;
 	}

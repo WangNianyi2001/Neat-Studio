@@ -56,7 +56,7 @@ export default class Panel extends Control {
 		this.$resizer.classList.add('resizer');
 		this.element.append(this.$resizer);
 		this.$resizer.addEventListener('mousedragmove', (event: MouseEvent) => {
-			this.size = new Tensor([event.pageX, event.pageY]).Minus(this.pagePos);
+			this.size = new Tensor([event.pageX, event.pageY]).Minus(this.position);
 		});
 	}
 }

@@ -45,7 +45,7 @@ export const manager = new Manager();
 
 declare global {
 	interface HTMLElement {
-		control: Control | null
+		control?: Control
 	}
 }
 
@@ -59,7 +59,7 @@ export default class Control extends EventTarget {
 	get size(): Tensor {
 		return new Tensor([this.element.offsetWidth, this.element.offsetHeight]);
 	}
-	get pagePos(): Tensor {
+	get position(): Tensor {
 		return new Tensor([this.element.offsetLeft, this.element.offsetTop]);
 	}
 
