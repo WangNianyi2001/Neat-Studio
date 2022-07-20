@@ -1,12 +1,51 @@
 import Control from '../control';
 import Panel from '../panel';
-import * as SVG from '@svgdotjs/svg.js';
+import { SVG, Svg, Path as SVGPathElement } from '@svgdotjs/svg.js';
 import './graph-editor.scss';
 import Station from '@core/station';
 import Graph from '@core/graph';
 import Tensor from '@util/tensor';
 import { MouseDragEvent } from '@neat/util/mousedrag';
 import { Entry } from '../context-menu';
+import { RelativePosition } from '@util/coordinate';
+
+class RouteControl {
+	readonly route: Station.Route;
+	readonly fromCtrl: PortControl;
+	readonly toCtrl: PortControl;
+	readonly $: SVGPathElement;
+	readonly #onUpdate: Function;
+
+	constructor(route: Station.Route, fromCtrl: PortControl, toCtrl: PortControl) {
+		this.route = route;
+		this.fromCtrl = fromCtrl;
+		this.toCtrl = toCtrl;
+		this.$ = fromCtrl.stationCtrl.editor.svg.path();
+		this.#onUpdate = this.OnUpdate.bind(this);
+		this.fromCtrl.$.classList.add('connected');
+		this.toCtrl.$.classList.add('connected');
+		this.fromCtrl.stationCtrl.addEventListener('move', this.#onUpdate as EventListener);
+		this.toCtrl.stationCtrl.addEventListener('move', this.#onUpdate as EventListener);
+		this.OnUpdate();
+	}
+
+	OnUpdate() {
+		const editor = this.fromCtrl.stationCtrl.editor;
+		const fromPos = RelativePosition(this.fromCtrl.$knob, editor.viewport.$);
+		const toPos = RelativePosition(this.toCtrl.$knob, editor.viewport.$);
+		const xDelta = (toPos.components![0].scalor - fromPos.components![0].scalor) / 2;
+		this.$.plot(`
+			M ${fromPos.ToSVG()}
+			C ${fromPos.Plus(new Tensor([xDelta, 0])).ToSVG()}
+			  ${toPos.Plus(new Tensor([-xDelta, 0])).ToSVG()}
+			  ${toPos.ToSVG()}
+		`);
+		this.$.stroke({
+			color: 'white',
+			width: 1
+		});
+	}
+}
 
 export class PortControl extends Control {
 	readonly port: Station.Port;
@@ -56,9 +95,10 @@ export class PortControl extends Control {
 	}
 
 	ConnectTo(peer: PortControl) {
-		this.port.Connect(peer.port);
-		this.$.classList.add('connected');
-		peer.$.classList.add('connected');
+		const route = this.port.ConnectTo(peer.port);
+		if(route === null)
+			return;
+		new RouteControl(route, this, peer);	// Need to exchange
 	}
 }
 
@@ -88,11 +128,8 @@ export class StationControl extends Control {
 
 		this.$header.addEventListener('mousedragstart', () => {
 			const start: Tensor = this.position;
-			const OnMove = ({ offset }: MouseDragEvent) => {
-				const position: Tensor = start.Plus(offset.Scale(1 / this.editor.scale));
-				this.$.style.left = `${position.components![0]}px`;
-				this.$.style.top = `${position.components![1]}px`;
-			};
+			const OnMove = ({ offset }: MouseDragEvent) => 
+				this.MoveTo(start.Plus(offset.Scale(1 / this.editor.scale)));
 			this.$header.addEventListener('mousedragmove', OnMove);
 			this.$header.addEventListener('mousedragend', function(this: HTMLElement) {
 				this.removeEventListener('mousedragmove', OnMove);
@@ -113,12 +150,19 @@ export class StationControl extends Control {
 		for(const port of [this.station.exports, this.station.imports].flat())
 			new PortControl(port, this);
 	}
+
+	MoveTo(position: Tensor) {
+		this.$.style.left = `${position.components![0]}px`;
+		this.$.style.top = `${position.components![1]}px`;
+		const moveEv = new Event('move');
+		requestAnimationFrame(this.dispatchEvent.bind(this, moveEv));
+	}
 }
 
 export default class GraphEditor extends Panel {
 	readonly graph: Graph;
 	readonly viewport: Control;
-	readonly svg: SVG.Svg;
+	readonly svg: Svg;
 	readonly contextMenu = new Entry(
 		'', null, [
 			new Entry(
@@ -161,8 +205,11 @@ export default class GraphEditor extends Panel {
 			return false;
 		});
 
-		this.svg = SVG.SVG();
+		this.svg = SVG();
 		this.svg.addTo(this.viewport.$ as HTMLElement);
+		this.addEventListener('resize', function(this: GraphEditor) {
+			this.svg.size(...this.size.ToArray() as Array<number>);
+		});
 
 		for(const station of this.graph.stations)
 			this.AddStation(station);

@@ -47,6 +47,10 @@
 					padding-block: .2rem .3rem;
 					min-width: 1rem;
 
+					&.export>.port {
+						flex-direction: row-reverse;
+					}
+
 					>.port {
 						display: flex;
 						align-items: center;

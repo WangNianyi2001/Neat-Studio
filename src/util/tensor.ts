@@ -58,6 +58,9 @@ export default class Tensor implements Iterable<Tensor | number> {
 				component => component.ToArray()
 			);
 	}
+	ToSVG(): string {
+		return (this.ToArray() as Array<number>).join(' ');
+	}
 
 	Copy(): Tensor {
 		return new Tensor(this.components || this.scalor);

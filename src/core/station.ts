@@ -63,18 +63,9 @@ module Station {
 			this.routes = new Set<Route>();
 		}
 
-		abstract Connect(target: Port): void;
-
-		abstract Disconnect(target: Port): void;
-
-		RoutesTo(target: Port): Set<Route> {
-			const set = new Set<Route>();
-			for(const route of this.routes) {
-				if(route.Has(target))
-					set.add(route);
-			}
-			return set;
-		}
+		abstract CanConnectTo(target: Port): boolean;
+		abstract ConnectTo(target: Port): Route | null;
+		abstract DisconnectFrom(target: Port): void;
 
 		ConnectedTo(target: Port): boolean {
 			for(const route of this.routes) {

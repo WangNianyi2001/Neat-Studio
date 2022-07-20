@@ -66,14 +66,26 @@ export class Port extends Station.Port {
 		});
 		this.delegate = replacement;
 	}
-	
-	override Connect(target: Port): void {
+
+	override CanConnectTo(target: Port): boolean {
 		if(this.ConnectedTo(target))
-			return;
-		this.routes.add(new Route(this, target));
+			return false;
+		if(this.type === target.type)
+			return false;
+		if(this.dataType !== target.dataType)
+			return false;
+		return true;
+	}
+	
+	override ConnectTo(target: Port): Route | null {
+		if(!this.CanConnectTo(target))
+			return null;
+		const route = new Route(this, target);
+		this.routes.add(route);
+		return route;
 	}
 
-	override Disconnect(target: Port): void {
+	override DisconnectFrom(target: Port): void {
 		if(!this.ConnectedTo(target))
 			return;
 		for(const route of this.routes) {
