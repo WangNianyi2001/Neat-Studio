@@ -8,6 +8,7 @@ import Tensor from '@util/tensor';
 import { MouseDragEvent } from '@neat/util/mousedrag';
 import { Entry } from '../context-menu';
 import { RelativePosition } from '@util/coordinate';
+import '@util/html-element';
 
 class RouteControl {
 	readonly route: Station.Route;
@@ -83,14 +84,10 @@ export class PortControl extends Control {
 		this.$.append(this.$knob, this.$name);
 
 		this.$.addEventListener('mousedragend', (ev: MouseDragEvent) => {
-			for(
-				let target: HTMLElement | null = ev.$drop;
-				target = target?.parentElement ?? null; ) {
-				if(target.control instanceof PortControl) {
-					this.ConnectTo(target.control);
-					return;
-				}
-			}
+			console.log(ev.target, ev.$drop);
+			const targetPort = ev.$drop?.FindInParent($ => $.control instanceof PortControl);
+			if(targetPort)
+				this.ConnectTo(targetPort.control as PortControl);
 		});
 	}
 
@@ -202,6 +199,7 @@ export default class GraphEditor extends Panel {
 		this.viewport.$.addEventListener('contextmenu', (ev: Event) => {
 			this.contextMenu.Show();
 			ev.preventDefault();
+			ev.stopPropagation();
 			return false;
 		});
 

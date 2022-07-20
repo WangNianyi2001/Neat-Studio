@@ -3,6 +3,7 @@ import Tensor from "@neat/util/tensor";
 import Control from "./control";
 import Mouse from '@util/mouse';
 import * as UI from '@neat/ui';
+import '@util/html-element'
 
 export class Entry {
 	name: string;
@@ -55,6 +56,8 @@ export class Entry {
 	Show(root: EntryItem | null = null) {
 		if(!(this.content instanceof Array))
 			return;
+		if(root === null)
+			HideCurrent();
 		this.panel = new EntryPanel(this);
 		this.panel.Show(root);
 	}
@@ -65,16 +68,14 @@ export class Entry {
 
 let currentPanel: EntryPanel | null = null;
 
-function HideCurrentPanel() {
+export function HideCurrent() {
 	currentPanel?.Hide();
 }
+
 document.body.addEventListener('click', function(ev: Event) {
-	for(let target: HTMLElement | null = ev.target as HTMLElement;
-		target = target.parentElement;) {
-		if(target.control instanceof EntryControl)
-			return;
-	}
-	HideCurrentPanel();
+	if((ev.target as HTMLElement).FindInParent?.(current => current.control instanceof EntryControl))
+		return;
+	HideCurrent();
 });
 
 class EntryControl extends Control {
@@ -137,7 +138,7 @@ class EntryItem extends EntryControl {
 		this.$.addEventListener('click', () => {
 			if(content instanceof Function) {
 				content();
-				HideCurrentPanel();
+				HideCurrent();
 			}
 			else if(content instanceof Array<Entry>)
 				this.entry.Show(this);
