@@ -1,0 +1,55 @@
+.panel {
+	display: flex;
+	flex-direction: column;
+	position: absolute;
+	min-width: 16rem;
+	min-height: 12rem;
+	border: 1px solid #444;
+	border-radius: 2px;
+	background-color: #0c0c0c;
+
+	>header {
+		$height: 1.5rem;
+
+		display: flex;
+		align-items: center;
+		height: $height;
+		line-height: $height;
+		background-color: #222;
+		user-select: none;
+
+		>.name {
+			flex-grow: 1;
+			display: inline-block;
+			margin: 0;
+			padding: 0 .5rem;
+			height: 100%;
+			text-align: left;
+			font-weight: bold;
+			cursor: move;
+		}
+	}
+
+	>main {
+		position: relative;
+		flex-grow: 1;
+	}
+
+	>.resizer {
+		$size: .5rem;
+		$border-width: calc($size / 2);
+		$color: #888;
+
+		position: absolute;
+		right: 0;
+		bottom: 0;
+		width: $size;
+		height: $size;
+		border-left: $border-width transparent solid;
+		border-top: $border-width transparent solid;
+		border-right: $border-width $color solid;
+		border-bottom: $border-width $color solid;
+		
+		cursor: nwse-resize;
+	}
+}

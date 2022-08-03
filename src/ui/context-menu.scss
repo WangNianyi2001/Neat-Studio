@@ -1,0 +1,20 @@
+.context-menu {
+	display: block;
+	position: absolute;
+	list-style: none;
+	padding-left: 0;
+	height: fit-content;
+	
+	border: 1px solid #444;
+	border-radius: 2px;
+	overflow: visible;
+
+	>li {
+		padding: .25em;
+		background-color: #222;
+
+		&:nth-child(2n) {
+			background-color: #333;
+		}
+	}
+}
