@@ -1,4 +1,4 @@
-import { Control } from '../ui';
+import Control from './control';
 import './panel.scss';
 import Tensor from '@util/tensor';
 import { MouseDragEvent } from '@util/mousedrag';
@@ -19,6 +19,9 @@ export default class Panel extends Control {
 	set position(value: Tensor) {
 		this.$.style.left = `${value.components![0]}px`;
 		this.$.style.top = `${value.components![1]}px`;
+	}
+	get position(): Tensor {
+		return super.position;
 	}
 
 	get name(): string {
