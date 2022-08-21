@@ -84,10 +84,13 @@ export class PortControl extends Control {
 		this.$.append(this.$knob, this.$name);
 
 		this.$.addEventListener('mousedragend', (ev: MouseDragEvent) => {
-			console.log(ev.target, ev.$drop);
-			const targetPort = ev.$drop?.FindInParent($ => $.control instanceof PortControl);
-			if(targetPort)
-				this.ConnectTo(targetPort.control as PortControl);
+			const targetPortEl = ev.$drop?.FindInParent($ => $.control instanceof PortControl);
+			if(targetPortEl === null)
+				return;
+			const targetPortCtrl = targetPortEl?.control as PortControl;
+			if(this.port.ConnectedTo(targetPortCtrl.port))
+				return;
+			this.ConnectTo(targetPortCtrl);
 		});
 	}
 

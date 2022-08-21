@@ -1,7 +1,7 @@
 import { Control } from '../ui';
 import './panel.scss';
 import Tensor from '@util/tensor';
-import '@util/mousedrag';
+import { MouseDragEvent } from '@util/mousedrag';
 
 export default class Panel extends Control {
 	readonly $header: HTMLElement;
@@ -9,12 +9,16 @@ export default class Panel extends Control {
 	readonly $resizer: HTMLElement;
 	readonly content: Control;
 
-	set size(size: Tensor) {
-		this.$.style.width = `${size.components![0]}px`;
-		this.$.style.height = `${size.components![1]}px`;
+	set size(value: Tensor) {
+		this.$.style.width = `${value.components![0]}px`;
+		this.$.style.height = `${value.components![1]}px`;
 	}
 	get size(): Tensor {
 		return super.size;
+	}
+	set position(value: Tensor) {
+		this.$.style.left = `${value.components![0]}px`;
+		this.$.style.top = `${value.components![1]}px`;
 	}
 
 	get name(): string {
@@ -34,6 +38,9 @@ export default class Panel extends Control {
 		this.$name = document.createElement('p');
 		this.$name.classList.add('name');
 		this.$header.append(this.$name);
+		this.$header.addEventListener('mousedragmove', (event: MouseDragEvent) => {
+			this.position = event.start.Plus(event.offset);
+		});
 
 		this.name = name;
 
