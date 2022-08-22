@@ -113,7 +113,14 @@ export default class Tensor {
 	Minus(tensor: Tensor): Tensor {
 		return this.Combine(tensor, (a, b) => a - b);
 	}
-	Scale(scalar: number): Tensor {
+	Scale(scalar: number | Tensor): Tensor {
+		if(scalar instanceof Tensor)
+			return this.Combine(scalar, (a, b) => a * b);
 		return this.Map(x => x * scalar);
+	}
+	Modulo(divisor: number | Tensor): Tensor {
+		if(divisor instanceof Tensor)
+			return this.Combine(divisor, (a, b) => a % b);
+		return this.Map(x => x * divisor);
 	}
 }

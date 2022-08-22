@@ -43,8 +43,16 @@ export default class Panel extends Control {
 		this.$name = document.createElement('p');
 		this.$name.classList.add('name');
 		this.$header.append(this.$name);
-		this.$header.addEventListener('mousedragmove', (event: MouseDragEvent) => {
-			this.position = event.start.Plus(event.offset);
+		this.$header.addEventListener('mousedragstart', (event: MouseDragEvent) => {
+			const startPosition = this.position;
+			const OnDrag = (event: MouseDragEvent) => {
+				this.position = startPosition.Plus(event.offset);
+			};
+			this.$header.addEventListener('mousedragmove', OnDrag);
+			this.$header.addEventListener('mousedragend',
+				() => this.$header.removeEventListener('mousedragmove', OnDrag),
+				{ once: true }
+			);
 		});
 
 		this.name = name;

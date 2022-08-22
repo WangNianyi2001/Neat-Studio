@@ -1,4 +1,6 @@
 import Neat from '@neat/neat-studio';
 
-const timeline = new Neat.UI.Panel.Timeline();
-timeline.AttachTo(Neat.UI.root);
+const Panel = Neat.UI.Panel;
+
+new Panel.Inspector();
+new Panel.Timeline();
