@@ -6,16 +6,15 @@ declare global {
 	}
 }
 
-const resizeObserver = new ResizeObserver(function(entries) {
-	for(const entry of entries) {
-		const control = (entry.target as HTMLElement).control;
-		if(!control)
-			continue;
-		control.dispatchEvent(new Event('resize'));
-	}
-});
-
 export default class Control extends EventTarget {
+	static readonly resizeObserver = new ResizeObserver(function(entries) {
+		for(const entry of entries) {
+			const control = (entry.target as HTMLElement).control;
+			if(!control)
+				continue;
+			control.dispatchEvent(new Event('resize'));
+		}
+	});
 	readonly $: HTMLElement;
 	parent: Control | null = null;
 	#children: Control[] = [];
@@ -36,11 +35,11 @@ export default class Control extends EventTarget {
 		super();
 		this.$ = element;
 		this.$.control = this;
-		resizeObserver.observe(this.$);
+		Control.resizeObserver.observe(this.$);
 	}
 	
 	Destroy(): void {
-		resizeObserver.unobserve(this.$);
+		Control.resizeObserver.unobserve(this.$);
 		this.$.parentNode?.removeChild(this.$);
 		if(this.parent) {
 			const index = this.parent.#children.indexOf(this);

@@ -2,7 +2,7 @@ import Panel from './panel';
 import Tensor from '@neat/util/tensor';
 import * as UI from '@neat/ui';
 
-class PanelManager {
+export default class PanelManager {
 	panels = new Set<Panel>();
 	readonly #creationPositionStep = new Tensor([28, 28]);
 	#creationPosition = new Tensor([0, 0]);
@@ -22,5 +22,3 @@ class PanelManager {
 		this.panels.delete(panel);
 	}
 };
-
-export default new PanelManager();

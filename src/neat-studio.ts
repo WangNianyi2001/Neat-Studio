@@ -8,4 +8,4 @@ declare global {
 	interface Window { Neat: any; }
 }
 
-export default window.Neat = { Core, UI };
+export { Core, UI };

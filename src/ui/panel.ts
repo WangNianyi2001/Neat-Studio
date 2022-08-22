@@ -2,7 +2,7 @@ import Control from './control';
 import './panel.scss';
 import Tensor from '@util/tensor';
 import { MouseDragEvent } from '@util/mousedrag';
-import PanelManager from './panel-manager';
+import Session from '@neat/session';
 
 export default class Panel extends Control {
 	readonly $header: HTMLElement;
@@ -68,11 +68,11 @@ export default class Panel extends Control {
 			this.dispatchEvent(new Event('resize'));
 		});
 
-		PanelManager.Register(this);
+		Session.current!.panelManager.Register(this);
 	}
 
 	Destroy() {
-		PanelManager.Unregister(this);
+		Session.current!.panelManager.Unregister(this);
 		super.Destroy();
 	}
 }

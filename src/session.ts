@@ -1,11 +1,13 @@
 import * as Core from './core';
 import Destination from '@core/audio/destination';
+import PanelManager from '@ui/panel-manager';
 
 export default class Session {
 	static current: Session | null = null;
 
 	readonly context!: AudioContext;
 	readonly destination!: Destination;
+	readonly panelManager: PanelManager = new PanelManager();
 
 	constructor() {
 		if(Session.current !== null)
