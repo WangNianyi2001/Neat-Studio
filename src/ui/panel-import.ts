@@ -1,11 +1,5 @@
 export { default } from './panel';
 
-import GraphEditor from './panels/graph-editor';
-import Timeline from './panels/timeline';
-import ResourceDrawer from './panels/resource-drawer';
-
-export {
-	GraphEditor,
-	Timeline,
-	ResourceDrawer,
-}
+export { default as GraphEditor } from './panels/graph-editor';
+export { default as Timeline } from './panels/timeline';
+export { default as ResourceDrawer } from './panels/resource-drawer';
