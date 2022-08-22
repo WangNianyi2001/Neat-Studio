@@ -2,6 +2,7 @@ import Control from './control';
 import './panel.scss';
 import Tensor from '@util/tensor';
 import { MouseDragEvent } from '@util/mousedrag';
+import PanelManager from './panel-manager';
 
 export default class Panel extends Control {
 	readonly $header: HTMLElement;
@@ -10,15 +11,15 @@ export default class Panel extends Control {
 	readonly content: Control;
 
 	set size(value: Tensor) {
-		this.$.style.width = `${value.components![0]}px`;
-		this.$.style.height = `${value.components![1]}px`;
+		this.$.style.width = `${value.Components[0]}px`;
+		this.$.style.height = `${value.Components[1]}px`;
 	}
 	get size(): Tensor {
 		return super.size;
 	}
 	set position(value: Tensor) {
-		this.$.style.left = `${value.components![0]}px`;
-		this.$.style.top = `${value.components![1]}px`;
+		this.$.style.left = `${value.Components[0]}px`;
+		this.$.style.top = `${value.Components[1]}px`;
 	}
 	get position(): Tensor {
 		return super.position;
@@ -33,6 +34,7 @@ export default class Panel extends Control {
 
 	constructor(name: string) {
 		super(document.createElement('section'));
+
 		this.$.classList.add('panel');
 
 		this.$header = document.createElement('header');
@@ -57,5 +59,12 @@ export default class Panel extends Control {
 			this.size = new Tensor([event.pageX, event.pageY]).Minus(this.position);
 			this.dispatchEvent(new Event('resize'));
 		});
+
+		PanelManager.Register(this);
+	}
+
+	Destroy() {
+		PanelManager.Unregister(this);
+		super.Destroy();
 	}
 }

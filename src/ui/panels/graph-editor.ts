@@ -34,7 +34,7 @@ class RouteControl {
 		const editor = this.fromCtrl.stationCtrl.editor;
 		const fromPos = RelativePosition(this.fromCtrl.$knob, editor.viewport.$);
 		const toPos = RelativePosition(this.toCtrl.$knob, editor.viewport.$);
-		const xDelta = (toPos.components![0].scalor - fromPos.components![0].scalor) / 2;
+		const xDelta = (toPos.First - fromPos.First) / 2;
 		this.$.plot(`
 			M ${fromPos.ToSVG()}
 			C ${fromPos.Plus(new Tensor([xDelta, 0])).ToSVG()}
@@ -152,8 +152,8 @@ export class StationControl extends Control {
 	}
 
 	MoveTo(position: Tensor) {
-		this.$.style.left = `${position.components![0]}px`;
-		this.$.style.top = `${position.components![1]}px`;
+		this.$.style.left = `${position.Components[0]}px`;
+		this.$.style.top = `${position.Components[1]}px`;
 		const moveEv = new Event('move');
 		requestAnimationFrame(this.dispatchEvent.bind(this, moveEv));
 	}

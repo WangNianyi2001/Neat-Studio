@@ -100,8 +100,8 @@ class EntryPanel extends EntryControl {
 			return;
 
 		const position = root === null ? Mouse.position : root.subPosition;
-		this.$.style.left = `${position.components![0]}px`;
-		this.$.style.top = `${position.components![1]}px`;
+		this.$.style.left = `${position.Components[0]}px`;
+		this.$.style.top = `${position.Components[1]}px`;
 		this.$.innerHTML = '';
 
 		for(const subEntry of this.entry.content)
@@ -122,7 +122,7 @@ class EntryItem extends EntryControl {
 
 	get subPosition(): Tensor {
 		return this.position.Plus(
-			new Tensor([this.size.components![0].scalor, 0])
+			new Tensor([this.size.First, 0])
 		);
 	}
 
