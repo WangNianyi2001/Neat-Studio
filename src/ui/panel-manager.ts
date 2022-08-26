@@ -15,7 +15,7 @@ export default class PanelManager {
 		panel.position = this.#creationPosition;
 		this.#creationPosition = this.#creationPosition
 			.Plus(this.#creationPositionStep)
-			.Modulo(UI.root.size.Minus(panel.size));
+			.Modulo(UI.root.outerSize.Minus(panel.outerSize));
 	}
 
 	Unregister(panel: Panel) {

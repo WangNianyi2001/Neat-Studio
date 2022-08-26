@@ -157,13 +157,14 @@ export class StationControl extends Control {
 
 export default class GraphEditor extends Panel {
 	readonly graph: Graph;
+	readonly $viewport: HTMLElement;
 	readonly svg: Svg;
 	
 	#scale: number = 1;
 
 	set scale(value: number) {
 		this.#scale = value;
-		this.$inner.style.transform = `scale(${this.#scale})`;
+		this.$viewport.style.transform = `scale(${this.#scale})`;
 	}
 	get scale(): number {
 		return this.#scale;
@@ -175,8 +176,10 @@ export default class GraphEditor extends Panel {
 
 		this.$outer.classList.add('graph-editor');
 
-		this.$inner.classList.add('viewport');
-		this.$inner.addEventListener('wheel', (ev: WheelEvent) => {
+		this.$viewport = document.createElement('div');
+		this.Add(this.$viewport);
+		this.$viewport.classList.add('viewport');
+		this.$viewport.addEventListener('wheel', (ev: WheelEvent) => {
 			ev.stopPropagation();
 			ev.preventDefault();
 			this.scale *= Math.exp(-ev.deltaY / 1000);
@@ -198,9 +201,9 @@ export default class GraphEditor extends Panel {
 		);
 
 		this.svg = SVG();
-		this.svg.addTo(this.$inner);
+		this.svg.addTo(this.$viewport);
 		this.addEventListener('resize', function(this: GraphEditor) {
-			this.svg.size(...this.size.ToArray() as Array<number>);
+			this.svg.size(...this.innerSize.ToArray() as Array<number>);
 		});
 
 		for(const station of this.graph.stations)
@@ -214,7 +217,7 @@ export default class GraphEditor extends Panel {
 
 	AddStation(station: Station): StationControl {
 		const control = new StationControl(this, station);
-		control.AttachTo(this);
+		this.Add(control, false, this.$viewport);
 		return control;
 	}
 }

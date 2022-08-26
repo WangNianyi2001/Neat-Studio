@@ -123,7 +123,7 @@ class EntryItem extends EntryControl {
 
 	get subPosition(): Tensor {
 		return this.position.Plus(
-			new Tensor([this.size.First, 0])
+			new Tensor([this.outerSize.First, 0])
 		);
 	}
 

@@ -23,8 +23,11 @@ export default class Control extends EventTarget {
 	get children(): Control[] {
 		return this.#children.slice();
 	}
-	get size(): Tensor {
+	get outerSize(): Tensor {
 		return new Tensor([this.$outer.offsetWidth, this.$outer.offsetHeight]);
+	}
+	get innerSize(): Tensor {
+		return new Tensor([this.$inner.offsetWidth, this.$inner.offsetHeight]);
 	}
 	get position(): Tensor {
 		return new Tensor([this.$outer.offsetLeft, this.$outer.offsetTop]);

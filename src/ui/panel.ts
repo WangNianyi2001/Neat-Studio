@@ -9,12 +9,12 @@ export default class Panel extends Control {
 	readonly $name: HTMLElement;
 	readonly $resizer: HTMLElement;
 
-	set size(value: Tensor) {
+	set outerSize(value: Tensor) {
 		this.$outer.style.width = `${value.Components[0]}px`;
 		this.$outer.style.height = `${value.Components[1]}px`;
 	}
-	get size(): Tensor {
-		return super.size;
+	get outerSize(): Tensor {
+		return super.outerSize;
 	}
 	set position(value: Tensor) {
 		this.$outer.style.left = `${value.Components[0]}px`;
@@ -60,7 +60,7 @@ export default class Panel extends Control {
 		this.$resizer.classList.add('resizer');
 		this.Add(this.$resizer, false, true);
 		this.$resizer.addEventListener('mousedragmove', (event: MouseEvent) => {
-			this.size = new Tensor([event.pageX, event.pageY]).Minus(this.position);
+			this.outerSize = new Tensor([event.pageX, event.pageY]).Minus(this.position);
 			this.dispatchEvent(new Event('resize'));
 		});
 
