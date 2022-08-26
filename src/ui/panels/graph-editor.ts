@@ -163,19 +163,6 @@ export default class GraphEditor extends Panel {
 	readonly graph: Graph;
 	readonly viewport: Control;
 	readonly svg: Svg;
-	readonly contextMenu = new Entry(
-		'', null, [
-			new Entry(
-				'Create New Station', null,
-				[...Station.types].map(
-					([ name, type ]) => new Entry(
-						name, null,
-						this.CreateStation.bind(this, type)
-					)
-				)
-			)
-		]
-	);
 	
 	#scale: number = 1;
 
@@ -199,12 +186,19 @@ export default class GraphEditor extends Panel {
 		this.viewport = new Control(document.createElement('div'));
 		this.viewport.$.classList.add('viewport');
 		this.viewport.AttachTo(this.content);
-		this.viewport.$.addEventListener('contextmenu', (ev: Event) => {
-			this.contextMenu.Show();
-			ev.preventDefault();
-			ev.stopPropagation();
-			return false;
-		});
+		this.viewport.contextMenu = new Entry(
+			'', null, [
+				new Entry(
+					'Create New Station', null,
+					[...Station.types].map(
+						([ name, type ]) => new Entry(
+							name, null,
+							this.CreateStation.bind(this, type)
+						)
+					)
+				)
+			]
+		);
 
 		this.svg = SVG();
 		this.svg.addTo(this.viewport.$ as HTMLElement);

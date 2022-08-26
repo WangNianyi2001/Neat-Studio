@@ -1,4 +1,5 @@
 import Tensor from '@util/tensor';
+import { Entry } from './context-menu';
 
 declare global {
 	interface HTMLElement {
@@ -30,12 +31,19 @@ export default class Control extends EventTarget {
 	get pagePosition(): Tensor {
 		return new Tensor([this.$.clientLeft, this.$.clientTop]);
 	}
+	contextMenu: Entry | null = null;
 
 	constructor(element: HTMLElement) {
 		super();
 		this.$ = element;
 		this.$.control = this;
 		Control.resizeObserver.observe(this.$);
+		this.$.addEventListener('contextmenu', (ev: Event) => {
+			ev.preventDefault();
+			ev.stopPropagation();
+			this.contextMenu?.Show();
+			return false;
+		});
 	}
 	
 	Destroy(): void {

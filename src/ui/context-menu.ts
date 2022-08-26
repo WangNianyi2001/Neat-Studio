@@ -35,10 +35,11 @@ export class Entry {
 		}
 		return null;
 	}
-	AddSubEntry(path: string[], icon: typeof Image | null = null, content: Entry[] | Function = []): Entry | null {
+	AddSubEntry(path: string[] | string, icon: typeof Image | null = null, content: Entry[] | Function = []): Entry | null {
 		if(!(this.content instanceof Array))
 			return null;
-		const parent = this.FindEntry(path);
+		if(typeof path === 'string')
+			path = [path];
 		if(path.length === 0)
 			return null;
 		const first = path.shift()!;
