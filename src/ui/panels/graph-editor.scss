@@ -1,12 +1,14 @@
 .graph-editor {
+	align-items: stretch;
+
 	>main {
 		overflow: hidden;
 	}
 
 	.viewport {
-		position: absolute;
+		flex-grow: 1;
+
 		width: 100%;
-		height: 100%;
 		transition-property: transform;
 		transition-duration: .25s;
 		transition-timing-function: ease-in-out;

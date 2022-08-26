@@ -8,18 +8,17 @@ export default class Panel extends Control {
 	readonly $header: HTMLElement;
 	readonly $name: HTMLElement;
 	readonly $resizer: HTMLElement;
-	readonly content: Control;
 
 	set size(value: Tensor) {
-		this.$.style.width = `${value.Components[0]}px`;
-		this.$.style.height = `${value.Components[1]}px`;
+		this.$outer.style.width = `${value.Components[0]}px`;
+		this.$outer.style.height = `${value.Components[1]}px`;
 	}
 	get size(): Tensor {
 		return super.size;
 	}
 	set position(value: Tensor) {
-		this.$.style.left = `${value.Components[0]}px`;
-		this.$.style.top = `${value.Components[1]}px`;
+		this.$outer.style.left = `${value.Components[0]}px`;
+		this.$outer.style.top = `${value.Components[1]}px`;
 	}
 	get position(): Tensor {
 		return super.position;
@@ -33,12 +32,12 @@ export default class Panel extends Control {
 	}
 
 	constructor(name: string) {
-		super(document.createElement('section'));
+		super(document.createElement('section'), document.createElement('main'));
 
-		this.$.classList.add('panel');
+		this.$outer.classList.add('panel');
 
 		this.$header = document.createElement('header');
-		this.$.append(this.$header);
+		this.Add(this.$header, true, true);
 
 		this.$name = document.createElement('p');
 		this.$name.classList.add('name');
@@ -57,12 +56,9 @@ export default class Panel extends Control {
 
 		this.name = name;
 
-		this.content = new Control(document.createElement('main'));
-		this.content.AttachTo(this);
-
 		this.$resizer = document.createElement('div');
 		this.$resizer.classList.add('resizer');
-		this.$.append(this.$resizer);
+		this.Add(this.$resizer, false, true);
 		this.$resizer.addEventListener('mousedragmove', (event: MouseEvent) => {
 			this.size = new Tensor([event.pageX, event.pageY]).Minus(this.position);
 			this.dispatchEvent(new Event('resize'));

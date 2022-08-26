@@ -23,8 +23,8 @@ class RouteControl {
 		this.toCtrl = toCtrl;
 		this.$ = fromCtrl.stationCtrl.editor.svg.path();
 		this.#onUpdate = this.OnUpdate.bind(this);
-		this.fromCtrl.$.classList.add('connected');
-		this.toCtrl.$.classList.add('connected');
+		this.fromCtrl.$outer.classList.add('connected');
+		this.toCtrl.$outer.classList.add('connected');
 		this.fromCtrl.stationCtrl.addEventListener('move', this.#onUpdate as EventListener);
 		this.toCtrl.stationCtrl.addEventListener('move', this.#onUpdate as EventListener);
 		this.OnUpdate();
@@ -32,8 +32,8 @@ class RouteControl {
 
 	OnUpdate() {
 		const editor = this.fromCtrl.stationCtrl.editor;
-		const fromPos = RelativePosition(this.fromCtrl.$knob, editor.viewport.$);
-		const toPos = RelativePosition(this.toCtrl.$knob, editor.viewport.$);
+		const fromPos = RelativePosition(this.fromCtrl.$knob, editor.$inner);
+		const toPos = RelativePosition(this.toCtrl.$knob, editor.$inner);
 		const xDelta = (toPos.First - fromPos.First) / 2;
 		this.$.plot(`
 			M ${fromPos.ToSVG()}
@@ -64,15 +64,11 @@ export class PortControl extends Control {
 
 	constructor(port: Station.Port, stationCtrl: StationControl) {
 		super(document.createElement('div'));
-		this.$.classList.add('port');
+		this.$outer.classList.add('port');
 
 		this.port = port;
 		this.stationCtrl = stationCtrl;
-		this.AttachTo(this.stationCtrl,
-			this.port.type == Station.PortType.Import
-				? this.stationCtrl.$importSlot
-				: this.stationCtrl.$exportSlot
-		);
+		this.AttachTo(this.stationCtrl);
 
 		this.$knob = document.createElement('div');
 		this.$knob.classList.add('knob');
@@ -81,9 +77,9 @@ export class PortControl extends Control {
 		this.$name.classList.add('name');
 		this.name = this.name;
 
-		this.$.append(this.$knob, this.$name);
+		this.$outer.append(this.$knob, this.$name);
 
-		this.$.addEventListener('mousedragend', (ev: MouseDragEvent) => {
+		this.$outer.addEventListener('mousedragend', (ev: MouseDragEvent) => {
 			const targetPortEl = ev.$drop?.FindInParent($ => $.control instanceof PortControl);
 			if(targetPortEl === null)
 				return;
@@ -119,11 +115,11 @@ export class StationControl extends Control {
 		super(document.createElement('div'));
 		this.editor = editor;
 		this.station = station;
-		this.$.classList.add('station');
+		this.$outer.classList.add('station');
 
 		this.$header = document.createElement('header');
 		this.$main = document.createElement('main');
-		this.$.append(this.$header, this.$main);
+		this.$outer.append(this.$header, this.$main);
 		this.name = station.constructor.name;
 
 		this.$header.addEventListener('mousedragstart', () => {
@@ -152,8 +148,8 @@ export class StationControl extends Control {
 	}
 
 	MoveTo(position: Tensor) {
-		this.$.style.left = `${position.Components[0]}px`;
-		this.$.style.top = `${position.Components[1]}px`;
+		this.$outer.style.left = `${position.Components[0]}px`;
+		this.$outer.style.top = `${position.Components[1]}px`;
 		const moveEv = new Event('move');
 		requestAnimationFrame(this.dispatchEvent.bind(this, moveEv));
 	}
@@ -161,14 +157,13 @@ export class StationControl extends Control {
 
 export default class GraphEditor extends Panel {
 	readonly graph: Graph;
-	readonly viewport: Control;
 	readonly svg: Svg;
 	
 	#scale: number = 1;
 
 	set scale(value: number) {
 		this.#scale = value;
-		this.viewport.$.style.transform = `scale(${this.#scale})`;
+		this.$inner.style.transform = `scale(${this.#scale})`;
 	}
 	get scale(): number {
 		return this.#scale;
@@ -178,15 +173,17 @@ export default class GraphEditor extends Panel {
 		super("Graph Editor");
 		this.graph = graph;
 
-		this.$.classList.add('graph-editor');
-		this.$.addEventListener('wheel', (ev: WheelEvent) => {
+		this.$outer.classList.add('graph-editor');
+
+		this.$inner.classList.add('viewport');
+		this.$inner.addEventListener('wheel', (ev: WheelEvent) => {
+			ev.stopPropagation();
+			ev.preventDefault();
 			this.scale *= Math.exp(-ev.deltaY / 1000);
+			return false;
 		});
 
-		this.viewport = new Control(document.createElement('div'));
-		this.viewport.$.classList.add('viewport');
-		this.viewport.AttachTo(this.content);
-		this.viewport.contextMenu = new Entry(
+		this.contextMenu = new Entry(
 			'', null, [
 				new Entry(
 					'Create New Station', null,
@@ -201,7 +198,7 @@ export default class GraphEditor extends Panel {
 		);
 
 		this.svg = SVG();
-		this.svg.addTo(this.viewport.$ as HTMLElement);
+		this.svg.addTo(this.$inner);
 		this.addEventListener('resize', function(this: GraphEditor) {
 			this.svg.size(...this.size.ToArray() as Array<number>);
 		});
@@ -217,7 +214,7 @@ export default class GraphEditor extends Panel {
 
 	AddStation(station: Station): StationControl {
 		const control = new StationControl(this, station);
-		control.AttachTo(this.viewport);
+		control.AttachTo(this);
 		return control;
 	}
 }

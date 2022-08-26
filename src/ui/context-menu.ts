@@ -93,7 +93,7 @@ class EntryPanel extends EntryControl {
 		super(document.createElement('ul'), entry);
 		if(currentPanel === null)
 			currentPanel = this;
-		this.$.classList.add('context-menu');
+		this.$outer.classList.add('context-menu');
 	}
 
 	Show(root: EntryItem | null = null) {
@@ -101,9 +101,9 @@ class EntryPanel extends EntryControl {
 			return;
 
 		const position = root === null ? Mouse.position : root.subPosition;
-		this.$.style.left = `${position.Components[0]}px`;
-		this.$.style.top = `${position.Components[1]}px`;
-		this.$.innerHTML = '';
+		this.$outer.style.left = `${position.Components[0]}px`;
+		this.$outer.style.top = `${position.Components[1]}px`;
+		this.$outer.innerHTML = '';
 
 		for(const subEntry of this.entry.content)
 			new EntryItem(this, subEntry);
@@ -112,7 +112,7 @@ class EntryPanel extends EntryControl {
 	}
 
 	Hide() {
-		this.$.parentNode?.removeChild(this.$);
+		this.$outer.parentNode?.removeChild(this.$outer);
 		if(this === currentPanel)
 			currentPanel = null;
 	}
@@ -131,12 +131,12 @@ class EntryItem extends EntryControl {
 		super(document.createElement('li'), entry);
 		this.panel = panel;
 		this.AttachTo(this.panel);
-		this.$.innerText = entry.name;
+		this.$outer.innerText = entry.name;
 
 		const content = this.entry.content;
 		if(content === null)
-			this.$.setAttribute('disabled', '');
-		this.$.addEventListener('click', () => {
+			this.$outer.setAttribute('disabled', '');
+		this.$outer.addEventListener('click', () => {
 			if(content instanceof Function) {
 				content();
 				HideCurrent();

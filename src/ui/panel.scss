@@ -51,5 +51,6 @@
 		border-bottom: $border-width $color solid;
 		
 		cursor: nwse-resize;
+		user-select: none;
 	}
 }

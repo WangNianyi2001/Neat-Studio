@@ -40,7 +40,7 @@ declare global {
 
 document.body.addEventListener('mousedown', function(ev: MouseEvent) {
 	const $target = ev.target as HTMLElement;
-	const $root = UI.root.$;
+	const $root = UI.root.$outer;
 	let start = new Tensor([ev.pageX, ev.pageY]);
 	$target.dispatchEvent(new MouseDragEvent('mousedragstart', { event: ev, start, pagePos: start }));
 	const OnMouseMove = function(this: HTMLElement, ev: MouseEvent) {
