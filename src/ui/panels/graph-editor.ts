@@ -15,18 +15,18 @@ class RouteControl {
 	readonly fromCtrl: PortControl;
 	readonly toCtrl: PortControl;
 	readonly $: SVGPathElement;
-	readonly #onUpdate: Function;
 
 	constructor(route: Station.Route, fromCtrl: PortControl, toCtrl: PortControl) {
 		this.route = route;
 		this.fromCtrl = fromCtrl;
 		this.toCtrl = toCtrl;
 		this.$ = fromCtrl.stationCtrl.editor.svg.path();
-		this.#onUpdate = this.OnUpdate.bind(this);
 		this.fromCtrl.$outer.classList.add('connected');
 		this.toCtrl.$outer.classList.add('connected');
-		this.fromCtrl.stationCtrl.addEventListener('move', this.#onUpdate as EventListener);
-		this.toCtrl.stationCtrl.addEventListener('move', this.#onUpdate as EventListener);
+
+		const onUpdate = this.OnUpdate.bind(this);
+		this.fromCtrl.stationCtrl.addEventListener('move', onUpdate as EventListener);
+		this.toCtrl.stationCtrl.addEventListener('move', onUpdate as EventListener);
 		this.OnUpdate();
 	}
 
@@ -68,7 +68,12 @@ export class PortControl extends Control {
 
 		this.port = port;
 		this.stationCtrl = stationCtrl;
-		this.AttachTo(this.stationCtrl);
+		this.stationCtrl.Add(
+			this, false,
+			this.port.type === Station.PortType.Export
+				? this.stationCtrl.$exportSlot
+				: this.stationCtrl.$importSlot
+		);
 
 		this.$knob = document.createElement('div');
 		this.$knob.classList.add('knob');
@@ -102,7 +107,6 @@ export class StationControl extends Control {
 	readonly editor: GraphEditor;
 	readonly station: Station;
 	$header: HTMLElement;
-	$main: HTMLElement;
 	$importSlot: HTMLElement;
 	$belly: HTMLElement;
 	$exportSlot: HTMLElement;
@@ -112,14 +116,13 @@ export class StationControl extends Control {
 	}
 
 	constructor(editor: GraphEditor, station: Station) {
-		super(document.createElement('div'));
+		super(document.createElement('div'), document.createElement('main'));
 		this.editor = editor;
 		this.station = station;
 		this.$outer.classList.add('station');
 
 		this.$header = document.createElement('header');
-		this.$main = document.createElement('main');
-		this.$outer.append(this.$header, this.$main);
+		this.$outer.append(this.$header, this.$inner);
 		this.name = station.constructor.name;
 
 		this.$header.addEventListener('mousedragstart', () => {
@@ -141,7 +144,7 @@ export class StationControl extends Control {
 		this.$exportSlot = document.createElement('div');
 		this.$exportSlot.classList.add('slot', 'export');
 
-		this.$main.append(this.$importSlot, this.$belly, this.$exportSlot);
+		this.$inner.append(this.$importSlot, this.$belly, this.$exportSlot);
 
 		for(const port of [this.station.exports, this.station.imports].flat())
 			new PortControl(port, this);
